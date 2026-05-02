@@ -15,7 +15,7 @@ export default function Hero() {
         <img src={logo} alt="Ô Batroun Logo" className="w-28 h-28 mx-auto mb-6 rounded-full shadow-2xl" />
         <h1 className="font-heading text-5xl md:text-7xl font-bold mb-4">
           <span className="text-foreground">Ô Batroun</span>{" "}
-          <span className="text-primary italic">Guesthouse</span>
+          <span className="text-primary italic">Guesthouseeeeeeeeeee</span>
         </h1>
         <p className="text-lg md:text-xl text-foreground/70 mb-8 max-w-2xl mx-auto leading-relaxed">
           Your premium Mediterranean retreat in the heart of Batroun, Lebanon. Unwind in elegance, comfort, and coastal charm.
