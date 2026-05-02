@@ -31,7 +31,6 @@ export default function ChaletCard({ chalet }: Props) {
               <Users size={14} /> Up to {chalet.capacity}
             </span>
           )}
-          <span>{chalet.features.length} features</span>
         </div>
         <Link
           to={`/chalets/${chalet.slug}`}
