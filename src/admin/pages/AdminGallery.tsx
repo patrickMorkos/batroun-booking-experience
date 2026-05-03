@@ -26,7 +26,7 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 
 export default function AdminGallery() {
-  const { data: items, isLoading } = useAdminGalleryMedia();
+  const { data: items, isLoading, isError } = useAdminGalleryMedia();
   const uploadMutation = useGalleryMediaUpload();
   const deleteMutation = useGalleryMediaDelete();
   const reorderMutation = useGalleryMediaReorder();
@@ -103,7 +103,7 @@ export default function AdminGallery() {
     const reordered = [...items];
     [reordered[index - 1], reordered[index]] = [reordered[index], reordered[index - 1]];
     const updates = reordered.map((item, i) => ({ id: item.id, display_order: i }));
-    reorderMutation.mutate(updates);
+    reorderMutation.mutate(updates, { onError: () => toast.error("Failed to reorder. Please try again.") });
   };
 
   const handleMoveDown = (index: number) => {
@@ -111,11 +111,11 @@ export default function AdminGallery() {
     const reordered = [...items];
     [reordered[index], reordered[index + 1]] = [reordered[index + 1], reordered[index]];
     const updates = reordered.map((item, i) => ({ id: item.id, display_order: i }));
-    reorderMutation.mutate(updates);
+    reorderMutation.mutate(updates, { onError: () => toast.error("Failed to reorder. Please try again.") });
   };
 
   const handleTitleBlur = (id: string, title: string) => {
-    updateTitleMutation.mutate({ id, title });
+    updateTitleMutation.mutate({ id, title }, { onError: () => toast.error("Failed to update title.") });
   };
 
   return (
@@ -171,6 +171,13 @@ export default function AdminGallery() {
                 </CardContent>
               </Card>
             ))
+          : isError
+          ? (
+            <div className="py-12 text-center text-muted-foreground">
+              <p className="text-destructive font-medium">Failed to load gallery.</p>
+              <p className="text-sm mt-1">Please check your connection and refresh the page.</p>
+            </div>
+          )
           : items?.length === 0
           ? (
             <div className="py-12 text-center text-muted-foreground">

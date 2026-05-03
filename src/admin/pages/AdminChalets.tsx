@@ -11,7 +11,7 @@ import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminChalets() {
-  const { data: chalets, isLoading } = useAdminChalets();
+  const { data: chalets, isLoading, isError } = useAdminChalets();
   const deleteChalet = useDeleteChalet();
   const toggleActive = useToggleChaletActive();
 
@@ -23,7 +23,10 @@ export default function AdminChalets() {
   };
 
   const handleToggle = (id: string, currentActive: boolean) => {
-    toggleActive.mutate({ id, isActive: !currentActive });
+    toggleActive.mutate(
+      { id, isActive: !currentActive },
+      { onError: () => toast.error("Failed to update chalet status. Please try again.") }
+    );
   };
 
   return (
@@ -132,7 +135,13 @@ export default function AdminChalets() {
                   })}
             </TableBody>
           </Table>
-          {!isLoading && chalets?.length === 0 && (
+          {!isLoading && isError && (
+            <div className="py-12 text-center text-muted-foreground">
+              <p className="text-destructive font-medium">Failed to load chalets.</p>
+              <p className="text-sm mt-1">Please check your connection and refresh the page.</p>
+            </div>
+          )}
+          {!isLoading && !isError && chalets?.length === 0 && (
             <div className="py-12 text-center text-muted-foreground">
               <p>No chalets yet.</p>
               <Button asChild variant="link" className="mt-2">

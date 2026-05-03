@@ -16,7 +16,7 @@ export default function AdminChaletEdit() {
   const isNew = id === "new";
   const navigate = useNavigate();
 
-  const { data: chalet, isLoading } = useAdminChalet(isNew ? undefined : id);
+  const { data: chalet, isLoading, isError } = useAdminChalet(isNew ? undefined : id);
   const createChalet = useCreateChalet();
   const updateChalet = useUpdateChalet();
 
@@ -54,6 +54,18 @@ export default function AdminChaletEdit() {
         <div className="p-6 space-y-4">
           <Skeleton className="h-10 w-1/3" />
           <Skeleton className="h-40 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isNew && isError) {
+    return (
+      <div className="flex flex-col">
+        <AdminHeader title="Error" />
+        <div className="p-6 py-12 text-center text-muted-foreground">
+          <p className="text-destructive font-medium">Failed to load chalet.</p>
+          <p className="text-sm mt-1">Please check your connection and refresh the page.</p>
         </div>
       </div>
     );

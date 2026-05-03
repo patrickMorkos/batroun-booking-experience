@@ -14,7 +14,7 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE = 5 * 1024 * 1024;
 
 export default function AdminSiteImages() {
-  const { data: siteImages, isLoading } = useAdminSiteImages();
+  const { data: siteImages, isLoading, isError } = useAdminSiteImages();
   const uploadMutation = useSiteImageUpload();
   const deleteMutation = useSiteImageDelete();
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -72,6 +72,13 @@ export default function AdminSiteImages() {
                 </CardContent>
               </Card>
             ))
+          : isError
+          ? (
+            <div className="py-12 text-center text-muted-foreground">
+              <p className="text-destructive font-medium">Failed to load site images.</p>
+              <p className="text-sm mt-1">Please check your connection and refresh the page.</p>
+            </div>
+          )
           : SITE_IMAGE_SLOTS.map((config) => {
               const existing = getImageForSlot(config.slot);
               const isCustom = !!existing;

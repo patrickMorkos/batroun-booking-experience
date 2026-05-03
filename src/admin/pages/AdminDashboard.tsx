@@ -20,10 +20,12 @@ export default function AdminDashboard() {
   const endDate = useMemo(() => new Date().toISOString(), []);
   const startDate = useMemo(() => subDays(new Date(), rangeDays).toISOString(), [rangeDays]);
 
-  const { data: totalViews } = useTotalPageViews(startDate, endDate);
-  const { data: uniqueVisitors } = useUniqueVisitors(startDate, endDate);
-  const { data: dailyViews } = useDailyPageViews(startDate, endDate);
-  const { data: chaletViews } = useChaletPageViews(startDate, endDate);
+  const { data: totalViews, isError: viewsError } = useTotalPageViews(startDate, endDate);
+  const { data: uniqueVisitors, isError: visitorsError } = useUniqueVisitors(startDate, endDate);
+  const { data: dailyViews, isError: dailyError } = useDailyPageViews(startDate, endDate);
+  const { data: chaletViews, isError: chaletError } = useChaletPageViews(startDate, endDate);
+
+  const hasError = viewsError || visitorsError || dailyError || chaletError;
 
   const avgDaily = totalViews && rangeDays ? Math.round(totalViews / rangeDays) : 0;
   const topChalet = chaletViews?.[0]?.chalet_slug || "—";
@@ -70,6 +72,12 @@ export default function AdminDashboard() {
       </AdminHeader>
 
       <div className="p-6 space-y-6 min-w-0">
+        {hasError && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/5 p-4 text-center">
+            <p className="text-destructive font-medium text-sm">Failed to load some analytics data.</p>
+            <p className="text-xs text-muted-foreground mt-1">Please check your connection and refresh the page.</p>
+          </div>
+        )}
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard title="Total Page Views" value={totalViews ?? "—"} icon={Eye} description={`Last ${rangeDays} days`} />

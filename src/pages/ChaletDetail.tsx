@@ -42,7 +42,7 @@ function formatDate(d: Date) {
 
 export default function ChaletDetail() {
   const { slug } = useParams();
-  const { data: chalet, isLoading } = usePublicChalet(slug);
+  const { data: chalet, isLoading, isError } = usePublicChalet(slug);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [galleryApi, setGalleryApi] = useState<CarouselApi>();
   const [fullApi, setFullApi] = useState<CarouselApi>();
@@ -105,6 +105,18 @@ export default function ChaletDetail() {
               <Skeleton className="h-[500px] w-full rounded-2xl" />
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!chalet && isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h2 className="font-heading text-3xl text-foreground mb-4">Something went wrong</h2>
+          <p className="text-muted-foreground mb-4">We couldn't load this chalet. Please try again.</p>
+          <Link to="/#chalets" className="text-primary hover:underline">Back to Chalets</Link>
         </div>
       </div>
     );

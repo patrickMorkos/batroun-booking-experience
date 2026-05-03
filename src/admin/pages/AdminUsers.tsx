@@ -14,7 +14,7 @@ import type { Profile } from "@/types/database";
 
 export default function AdminUsers() {
   const { profile: currentUser } = useAuth();
-  const { data: users, isLoading } = useAdminUsers();
+  const { data: users, isLoading, isError } = useAdminUsers();
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
@@ -128,7 +128,13 @@ export default function AdminUsers() {
                   ))}
             </TableBody>
           </Table>
-          {!isLoading && users?.length === 0 && (
+          {!isLoading && isError && (
+            <div className="py-12 text-center text-muted-foreground">
+              <p className="text-destructive font-medium">Failed to load users.</p>
+              <p className="text-sm mt-1">Please check your connection and refresh the page.</p>
+            </div>
+          )}
+          {!isLoading && !isError && users?.length === 0 && (
             <div className="py-12 text-center text-muted-foreground">No users found.</div>
           )}
         </div>
