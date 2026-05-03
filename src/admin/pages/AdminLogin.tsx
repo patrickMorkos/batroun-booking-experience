@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
-import { LogIn } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required"),
@@ -80,7 +80,7 @@ export default function AdminLogin() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Signing in..." : "Sign In"}
+                {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Signing in...</> : "Sign In"}
               </Button>
             </form>
           </Form>

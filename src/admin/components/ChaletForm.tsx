@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
 import type { ChaletWithImages } from "@/types/database";
 
 const chaletSchema = z.object({
@@ -182,7 +183,7 @@ export default function ChaletForm({ chalet, onSubmit, isSubmitting }: ChaletFor
 
         <div className="flex justify-end gap-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : chalet ? "Update Chalet" : "Create Chalet"}
+            {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : chalet ? "Update Chalet" : "Create Chalet"}
           </Button>
         </div>
       </form>

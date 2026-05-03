@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useImageUpload } from "@/admin/hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { GripVertical, Trash2, Star } from "lucide-react";
+import { GripVertical, Trash2, Star, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ChaletImage } from "@/types/database";
 
@@ -13,7 +13,7 @@ interface ImageSortableListProps {
   images: ChaletImage[];
 }
 
-function SortableImage({ image, onDelete, onSetPrimary }: { image: ChaletImage; onDelete: () => void; onSetPrimary: () => void }) {
+function SortableImage({ image, onDelete, onSetPrimary, isDeleting, isSettingPrimary }: { image: ChaletImage; onDelete: () => void; onSetPrimary: () => void; isDeleting: boolean; isSettingPrimary: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: image.id });
 
   const style = {
@@ -26,6 +26,12 @@ function SortableImage({ image, onDelete, onSetPrimary }: { image: ChaletImage; 
     <div ref={setNodeRef} style={style} className="group relative aspect-square rounded-lg border border-border/50 overflow-hidden bg-muted">
       <img src={image.url} alt="" className="h-full w-full object-cover" />
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
+
+      {(isDeleting || isSettingPrimary) && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+          <Loader2 className="h-6 w-6 text-white animate-spin" />
+        </div>
+      )}
 
       <button
         type="button"
@@ -40,6 +46,7 @@ function SortableImage({ image, onDelete, onSetPrimary }: { image: ChaletImage; 
         <button
           type="button"
           onClick={onSetPrimary}
+          disabled={isSettingPrimary || image.is_primary}
           className={`rounded p-1 ${image.is_primary ? "bg-primary text-primary-foreground" : "bg-black/60 text-white hover:bg-primary"}`}
           title={image.is_primary ? "Primary image" : "Set as primary"}
         >
@@ -47,7 +54,7 @@ function SortableImage({ image, onDelete, onSetPrimary }: { image: ChaletImage; 
         </button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button type="button" className="rounded bg-black/60 p-1 text-white hover:bg-destructive">
+            <button type="button" className="rounded bg-black/60 p-1 text-white hover:bg-destructive" disabled={isDeleting}>
               <Trash2 className="h-4 w-4" />
             </button>
           </AlertDialogTrigger>
@@ -141,6 +148,8 @@ export default function ImageSortableList({ images: initialImages }: ImageSortab
               image={image}
               onDelete={() => handleDelete(image)}
               onSetPrimary={() => handleSetPrimary(image.id)}
+              isDeleting={deleteImage.isPending && deleteImage.variables?.imageId === image.id}
+              isSettingPrimary={reorder.isPending}
             />
           ))}
         </div>

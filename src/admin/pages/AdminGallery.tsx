@@ -190,14 +190,14 @@ export default function AdminGallery() {
                           disabled={index === 0 || reorderMutation.isPending}
                           className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30"
                         >
-                          <GripVertical className="h-4 w-4 rotate-180" />
+                          {reorderMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <GripVertical className="h-4 w-4 rotate-180" />}
                         </button>
                         <button
                           onClick={() => handleMoveDown(index)}
                           disabled={index === (items?.length ?? 0) - 1 || reorderMutation.isPending}
                           className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30"
                         >
-                          <GripVertical className="h-4 w-4" />
+                          {reorderMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <GripVertical className="h-4 w-4" />}
                         </button>
                       </div>
 
@@ -215,6 +215,9 @@ export default function AdminGallery() {
                             {item.type === "video" ? <><Film className="h-3 w-3 mr-1" /> Video</> : <><ImageIcon className="h-3 w-3 mr-1" /> Image</>}
                           </Badge>
                           <span className="text-xs text-muted-foreground">#{index + 1}</span>
+                          {updateTitleMutation.isPending && updateTitleMutation.variables?.id === item.id && (
+                            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                          )}
                         </div>
                         <Input
                           defaultValue={item.title}

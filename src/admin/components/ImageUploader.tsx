@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useImageUpload } from "@/admin/hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface ImageUploaderProps {
@@ -96,7 +96,7 @@ export default function ImageUploader({ chaletId, currentImageCount }: ImageUplo
             ))}
           </div>
           <Button onClick={uploadAll} disabled={upload.isPending} type="button">
-            {upload.isPending ? "Uploading..." : `Upload ${previews.length} image${previews.length > 1 ? "s" : ""}`}
+            {upload.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Uploading...</> : `Upload ${previews.length} image${previews.length > 1 ? "s" : ""}`}
           </Button>
         </div>
       )}
