@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { sharedAmenities } from "@/data/chalets";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { useGalleryMedia } from "@/hooks/useGalleryMedia";
@@ -8,11 +9,53 @@ import {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  type CarouselApi,
 } from "@/components/ui/carousel";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function Amenities() {
   const { data: siteImages } = useSiteImages();
   const { data: galleryMedia } = useGalleryMedia();
+  const [api, setApi] = useState<CarouselApi>();
+  const [fullApi, setFullApi] = useState<CarouselApi>();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setActiveIndex(api.selectedScrollSnap());
+    onSelect();
+    api.on("select", onSelect);
+    return () => { api.off("select", onSelect); };
+  }, [api]);
+
+  useEffect(() => {
+    if (!fullApi) return;
+    const onSelect = () => {
+      const idx = fullApi.selectedScrollSnap();
+      setActiveIndex(idx);
+      api?.scrollTo(idx);
+    };
+    onSelect();
+    fullApi.on("select", onSelect);
+    return () => { fullApi.off("select", onSelect); };
+  }, [fullApi, api]);
+
+  useEffect(() => {
+    if (isFullscreenOpen) fullApi?.scrollTo(activeIndex);
+  }, [isFullscreenOpen, activeIndex, fullApi]);
+
+  useEffect(() => {
+    if (!api || isFullscreenOpen) return;
+    const timer = window.setInterval(() => api.scrollNext(), 3000);
+    return () => window.clearInterval(timer);
+  }, [api, isFullscreenOpen]);
+
+  const openFullscreenAt = (index: number) => {
+    setActiveIndex(index);
+    setIsFullscreenOpen(true);
+    api?.scrollTo(index);
+  };
 
   const fallbackImages = [
     {
@@ -52,35 +95,88 @@ export default function Amenities() {
         </div>
 
         {hasGallery ? (
-          <Carousel opts={{ loop: true }} className="mx-auto max-w-4xl">
-            <CarouselContent>
-              {galleryMedia.map((item) => (
-                <CarouselItem key={item.id}>
-                  <div className="rounded-2xl overflow-hidden">
-                    {item.type === "video" ? (
-                      <video
-                        src={item.url}
-                        className="w-full h-64 md:h-96 object-cover"
-                        muted
-                        loop
-                        autoPlay
-                        playsInline
-                      />
-                    ) : (
-                      <img
-                        src={item.url}
-                        alt={item.title || "Gallery"}
-                        className="w-full h-64 md:h-96 object-cover"
-                        loading="lazy"
-                      />
-                    )}
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-2 md:-left-12" />
-            <CarouselNext className="right-2 md:-right-12" />
-          </Carousel>
+          <div className="mx-auto max-w-4xl">
+            <Carousel
+              setApi={setApi}
+              opts={{ loop: true, duration: 45 }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {galleryMedia.map((item, index) => (
+                  <CarouselItem key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => openFullscreenAt(index)}
+                      className="w-full rounded-2xl overflow-hidden border border-border/60 cursor-pointer"
+                    >
+                      {item.type === "video" ? (
+                        <video
+                          src={item.url}
+                          className="w-full h-80 md:h-[450px] object-cover"
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={item.url}
+                          alt={item.title || "Gallery"}
+                          className="w-full h-80 md:h-[450px] object-cover"
+                          loading={index === 0 ? "eager" : "lazy"}
+                        />
+                      )}
+                    </button>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 rounded-full bg-black/20 px-2 py-1">
+                {galleryMedia.map((item, index) => (
+                  <button
+                    key={`${item.id}-dot`}
+                    type="button"
+                    aria-label={`Go to slide ${index + 1}`}
+                    onClick={() => { setActiveIndex(index); api?.scrollTo(index); }}
+                    className={`h-1.5 w-1.5 rounded-full transition-all ${activeIndex === index ? "bg-white" : "bg-white/45 hover:bg-white/70"}`}
+                  />
+                ))}
+              </div>
+            </Carousel>
+
+            <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
+              <DialogContent className="max-w-[100vw] w-screen h-screen rounded-none border-none p-0 bg-black">
+                <Carousel setApi={setFullApi} opts={{ loop: true, startIndex: activeIndex }} className="h-full">
+                  <CarouselContent className="h-screen">
+                    {galleryMedia.map((item) => (
+                      <CarouselItem key={`${item.id}-full`} className="h-screen">
+                        <div className="h-full flex items-center justify-center bg-black">
+                          {item.type === "video" ? (
+                            <video
+                              src={item.url}
+                              className="max-h-screen w-full object-contain"
+                              muted
+                              controls
+                              autoPlay
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={item.url}
+                              alt={item.title || "Gallery"}
+                              className="max-h-screen w-full object-contain"
+                            />
+                          )}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-4 md:left-6 bg-background/70 hover:bg-background border-border" />
+                  <CarouselNext className="right-4 md:right-6 bg-background/70 hover:bg-background border-border" />
+                </Carousel>
+              </DialogContent>
+            </Dialog>
+          </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
             {fallbackImages.map((img, i) => (
