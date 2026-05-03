@@ -27,7 +27,7 @@ export default function AdminChalets() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-w-0">
       <AdminHeader title="Chalets">
         <Button asChild size="sm">
           <Link to="/admin/chalets/new">
@@ -37,8 +37,8 @@ export default function AdminChalets() {
         </Button>
       </AdminHeader>
 
-      <div className="p-6">
-        <div className="rounded-lg border border-border/50 bg-card">
+      <div className="p-6 overflow-hidden">
+        <div className="rounded-lg border border-border/50 bg-card overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

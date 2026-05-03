@@ -43,9 +43,9 @@ export default function AdminDashboard() {
   }, [chaletViews]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-w-0">
       <AdminHeader title="Dashboard">
-        <div className="flex gap-1 items-center">
+        <div className="flex gap-1 items-center flex-wrap">
           {DATE_RANGES.map((range) => (
             <Button
               key={range.days}
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
         </div>
       </AdminHeader>
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 min-w-0">
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard title="Total Page Views" value={totalViews ?? "—"} icon={Eye} description={`Last ${rangeDays} days`} />
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
 
         {/* Charts */}
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border-border/50 bg-card">
+          <Card className="border-border/50 bg-card min-w-0">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Views Over Time</CardTitle>
             </CardHeader>
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/50 bg-card">
+          <Card className="border-border/50 bg-card min-w-0">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Views per Chalet</CardTitle>
             </CardHeader>
