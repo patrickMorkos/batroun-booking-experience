@@ -16,19 +16,49 @@ export function useAdminGalleryMedia() {
   });
 }
 
+function uploadWithProgress(
+  url: string,
+  file: File,
+  token: string,
+  onProgress?: (pct: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    });
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error(xhr.responseText || `Upload failed (${xhr.status})`));
+    });
+    xhr.addEventListener("error", () => reject(new Error("Network error during upload")));
+    xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
+    xhr.send(file);
+  });
+}
+
 export function useGalleryMediaUpload() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ file, title }: { file: File; title?: string }) => {
+    mutationFn: async ({ file, title, onProgress }: { file: File; title?: string; onProgress?: (pct: number) => void }) => {
       const fileExt = file.name.split(".").pop()?.toLowerCase() || "bin";
       const fileName = `gallery/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
       const type = file.type.startsWith("video/") ? "video" : "image";
 
-      const { error: uploadError } = await supabase.storage
-        .from("gallery-media")
-        .upload(fileName, file, { contentType: file.type, upsert: false });
-      if (uploadError) throw uploadError;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) throw new Error("Not authenticated");
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const uploadUrl = `${supabaseUrl}/storage/v1/object/gallery-media/${fileName}`;
+
+      await uploadWithProgress(uploadUrl, file, token, onProgress);
 
       const { data: urlData } = supabase.storage
         .from("gallery-media")

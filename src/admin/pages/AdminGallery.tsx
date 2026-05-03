@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   useAdminGalleryMedia,
   useGalleryMediaUpload,
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Upload, Trash2, Loader2, GripVertical, Film, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +23,7 @@ const ACCEPTED_TYPES = [
   "video/mp4", "video/webm", "video/quicktime",
 ];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const MAX_VIDEO_SIZE = 200 * 1024 * 1024;
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 
 export default function AdminGallery() {
   const { data: items, isLoading } = useAdminGalleryMedia();
@@ -31,6 +32,7 @@ export default function AdminGallery() {
   const reorderMutation = useGalleryMediaReorder();
   const updateTitleMutation = useGalleryMediaUpdateTitle();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ name: string; pct: number }[]>([]);
 
   const handleFiles = (files: FileList) => {
     const valid: File[] = [];
@@ -41,30 +43,44 @@ export default function AdminGallery() {
       }
       const maxSize = file.type.startsWith("video/") ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
       if (file.size > maxSize) {
-        toast.error(`"${file.name}" is too large. ${file.type.startsWith("video/") ? "Videos must be under 200MB." : "Images must be under 5MB."}`);
+        toast.error(`"${file.name}" is too large. ${file.type.startsWith("video/") ? "Videos must be under 50MB. Try compressing the video first." : "Images must be under 5MB."}`);
         continue;
       }
       valid.push(file);
     }
     if (valid.length === 0) return;
+
+    setUploadProgress(valid.map((f) => ({ name: f.name, pct: 0 })));
     let completed = 0;
     let failed = 0;
-    for (const file of valid) {
+
+    for (let i = 0; i < valid.length; i++) {
+      const file = valid[i];
+      const idx = i;
       uploadMutation.mutate(
-        { file },
+        {
+          file,
+          onProgress: (pct) => {
+            setUploadProgress((prev) => prev.map((p, j) => j === idx ? { ...p, pct } : p));
+          },
+        },
         {
           onSuccess: () => {
             completed++;
+            setUploadProgress((prev) => prev.map((p, j) => j === idx ? { ...p, pct: 100 } : p));
             if (completed + failed === valid.length) {
+              setTimeout(() => setUploadProgress([]), 1000);
               if (failed === 0) toast.success(`${valid.length} file${valid.length > 1 ? "s" : ""} uploaded.`);
               else toast.warning(`${completed} uploaded, ${failed} failed.`);
             }
           },
           onError: (e) => {
             failed++;
+            setUploadProgress((prev) => prev.map((p, j) => j === idx ? { ...p, pct: -1 } : p));
             toast.error(`Failed to upload "${file.name}": ${e.message}`);
-            if (completed + failed === valid.length && completed > 0) {
-              toast.warning(`${completed} uploaded, ${failed} failed.`);
+            if (completed + failed === valid.length) {
+              setTimeout(() => setUploadProgress([]), 2000);
+              if (completed > 0) toast.warning(`${completed} uploaded, ${failed} failed.`);
             }
           },
         }
@@ -123,6 +139,22 @@ export default function AdminGallery() {
           </Button>
         </div>
       </AdminHeader>
+
+      {uploadProgress.length > 0 && (
+        <div className="px-6 pt-4 space-y-2">
+          {uploadProgress.map((item, i) => (
+            <div key={i} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="truncate max-w-[200px] text-muted-foreground">{item.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {item.pct === -1 ? "Failed" : `${item.pct}%`}
+                </span>
+              </div>
+              <Progress value={item.pct === -1 ? 100 : item.pct} className={`h-2 ${item.pct === -1 ? "[&>div]:bg-destructive" : ""}`} />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="p-6 space-y-4">
         {isLoading
