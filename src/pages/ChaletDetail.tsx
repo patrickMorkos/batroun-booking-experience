@@ -8,6 +8,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Skeleton } from "@/components/ui/skeleton";
 import { Check, ArrowLeft, Clock, Users, MessageCircle } from "lucide-react";
 import OptimizedImage from "@/components/OptimizedImage";
+import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { DateRange } from "react-day-picker";
@@ -162,6 +163,10 @@ export default function ChaletDetail() {
     galleryApi?.scrollTo(index);
   };
 
+  const { elRef: swipeRef, onTouchStart, onTouchMove, onTouchEnd } = useSwipeDismiss(
+    () => setIsFullscreenOpen(false)
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -222,24 +227,32 @@ export default function ChaletDetail() {
 
               <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
                 <DialogContent className="max-w-[100vw] w-screen h-screen rounded-none border-none p-0 bg-black">
-                  <Carousel setApi={setFullApi} opts={{ loop: true, startIndex: activeIndex }} className="h-full">
-                    <CarouselContent className="h-screen">
-                      {images.map((image, index) => (
-                        <CarouselItem key={`${image.id}-full`} className="h-screen">
-                          <div className="h-full flex items-center justify-center bg-black">
-                            <img
-                              src={image.url}
-                              alt={`${chalet.name} fullscreen ${index + 1}`}
-                              className="max-h-screen w-full object-contain"
-                              decoding="async"
-                            />
-                          </div>
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="left-4 md:left-6 bg-background/70 hover:bg-background border-border" />
-                    <CarouselNext className="right-4 md:right-6 bg-background/70 hover:bg-background border-border" />
-                  </Carousel>
+                  <div
+                    ref={swipeRef}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                    className="h-full"
+                  >
+                    <Carousel setApi={setFullApi} opts={{ loop: true, startIndex: activeIndex }} className="h-full">
+                      <CarouselContent className="h-screen">
+                        {images.map((image, index) => (
+                          <CarouselItem key={`${image.id}-full`} className="h-screen">
+                            <div className="h-full flex items-center justify-center bg-black">
+                              <img
+                                src={image.url}
+                                alt={`${chalet.name} fullscreen ${index + 1}`}
+                                className="max-h-screen w-full object-contain"
+                                decoding="async"
+                              />
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-4 md:left-6 bg-background/70 hover:bg-background border-border" />
+                      <CarouselNext className="right-4 md:right-6 bg-background/70 hover:bg-background border-border" />
+                    </Carousel>
+                  </div>
                 </DialogContent>
               </Dialog>
 

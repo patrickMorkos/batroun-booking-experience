@@ -7,19 +7,18 @@ interface Props {
 }
 
 export default function LazyVideo({ src, className = "", controls = false }: Props) {
-  const ref = useVideoAutoplay();
+  const { ref, isNearViewport } = useVideoAutoplay();
 
   return (
     <video
       ref={ref}
-      preload="metadata"
+      src={isNearViewport ? src : undefined}
+      preload="none"
       muted
       loop
       playsInline
       controls={controls}
       className={className}
-    >
-      <source src={src} type="video/mp4" />
-    </video>
+    />
   );
 }

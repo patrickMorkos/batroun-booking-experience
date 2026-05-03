@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export function useVideoAutoplay(threshold = 0.4) {
+export function useVideoAutoplay(threshold = 0.3) {
   const ref = useRef<HTMLVideoElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
 
   useEffect(() => {
     const video = ref.current;
@@ -10,18 +11,19 @@ export function useVideoAutoplay(threshold = 0.4) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          setIsNearViewport(true);
+          video.preload = "auto";
           video.play().catch(() => {});
         } else {
           video.pause();
-          video.currentTime = 0;
         }
       },
-      { threshold }
+      { threshold, rootMargin: "200px" }
     );
 
     observer.observe(video);
     return () => observer.disconnect();
   }, [threshold]);
 
-  return ref;
+  return { ref, isNearViewport };
 }

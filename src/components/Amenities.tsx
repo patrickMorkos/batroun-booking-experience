@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { sharedAmenities } from "@/data/chalets";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { useGalleryMedia } from "@/hooks/useGalleryMedia";
+import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
 import OptimizedImage from "@/components/OptimizedImage";
 import LazyVideo from "@/components/LazyVideo";
@@ -58,6 +59,10 @@ export default function Amenities() {
     setIsFullscreenOpen(true);
     api?.scrollTo(index);
   };
+
+  const { elRef: swipeRef, onTouchStart, onTouchMove, onTouchEnd } = useSwipeDismiss(
+    () => setIsFullscreenOpen(false)
+  );
 
   const fallbackImages = [
     {
@@ -147,36 +152,44 @@ export default function Amenities() {
 
             <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
               <DialogContent className="max-w-[100vw] w-screen h-screen rounded-none border-none p-0 bg-black">
-                <Carousel setApi={setFullApi} opts={{ loop: true, startIndex: activeIndex }} className="h-full">
-                  <CarouselContent className="h-screen">
-                    {galleryMedia.map((item) => (
-                      <CarouselItem key={`${item.id}-full`} className="h-screen">
-                        <div className="h-full flex items-center justify-center bg-black">
-                          {item.type === "video" ? (
-                            <video
-                              src={item.url}
-                              className="max-h-screen w-full object-contain"
-                              muted
-                              controls
-                              autoPlay
-                              playsInline
-                              preload="metadata"
-                            />
-                          ) : (
-                            <img
-                              src={item.url}
-                              alt={item.title || "Gallery"}
-                              className="max-h-screen w-full object-contain"
-                              decoding="async"
-                            />
-                          )}
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-4 md:left-6 bg-background/70 hover:bg-background border-border" />
-                  <CarouselNext className="right-4 md:right-6 bg-background/70 hover:bg-background border-border" />
-                </Carousel>
+                <div
+                  ref={swipeRef}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  className="h-full"
+                >
+                  <Carousel setApi={setFullApi} opts={{ loop: true, startIndex: activeIndex }} className="h-full">
+                    <CarouselContent className="h-screen">
+                      {galleryMedia.map((item) => (
+                        <CarouselItem key={`${item.id}-full`} className="h-screen">
+                          <div className="h-full flex items-center justify-center bg-black">
+                            {item.type === "video" ? (
+                              <video
+                                src={item.url}
+                                className="max-h-screen w-full object-contain"
+                                muted
+                                controls
+                                autoPlay
+                                playsInline
+                                preload="metadata"
+                              />
+                            ) : (
+                              <img
+                                src={item.url}
+                                alt={item.title || "Gallery"}
+                                className="max-h-screen w-full object-contain"
+                                decoding="async"
+                              />
+                            )}
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-4 md:left-6 bg-background/70 hover:bg-background border-border" />
+                    <CarouselNext className="right-4 md:right-6 bg-background/70 hover:bg-background border-border" />
+                  </Carousel>
+                </div>
               </DialogContent>
             </Dialog>
           </div>
