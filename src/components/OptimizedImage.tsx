@@ -20,10 +20,7 @@ export default function OptimizedImage({
   sizes = "(max-width: 768px) 100vw, 50vw",
 }: Props) {
   return (
-    <div
-      className={`relative overflow-hidden bg-muted ${containerClassName}`}
-      style={{ aspectRatio: `${width}/${height}` }}
-    >
+    <div className={`relative overflow-hidden bg-muted ${containerClassName}`}>
       <img
         src={src}
         sizes={sizes}

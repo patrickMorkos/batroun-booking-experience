@@ -114,17 +114,17 @@ export default function Amenities() {
                       {item.type === "video" ? (
                         <LazyVideo
                           src={item.url}
-                          className="w-full h-80 md:h-[450px] object-cover"
+                          className="w-full h-[70vh] md:h-[550px] object-contain bg-black"
                         />
                       ) : (
                         <OptimizedImage
                           src={item.url}
                           alt={item.title || "Gallery"}
                           width={1200}
-                          height={450}
+                          height={1600}
                           priority={index === 0}
                           sizes="(max-width: 768px) 100vw, 800px"
-                          containerClassName="w-full h-80 md:h-[450px]"
+                          containerClassName="w-full h-[70vh] md:h-[550px]"
                         />
                       )}
                     </button>
