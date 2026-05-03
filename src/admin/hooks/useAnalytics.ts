@@ -80,3 +80,23 @@ export function useTopPages(startDate: string, endDate: string) {
     },
   });
 }
+
+export function useSocialClicks(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: ["analytics-social-clicks", startDate, endDate],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("social_clicks")
+        .select("platform")
+        .gte("created_at", startDate)
+        .lte("created_at", endDate);
+      if (error) throw error;
+
+      const counts: Record<string, number> = {};
+      data?.forEach((r) => { counts[r.platform] = (counts[r.platform] || 0) + 1; });
+      return Object.entries(counts)
+        .map(([platform, count]) => ({ platform, count }))
+        .sort((a, b) => b.count - a.count);
+    },
+  });
+}

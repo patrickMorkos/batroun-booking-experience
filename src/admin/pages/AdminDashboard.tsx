@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { format, subDays } from "date-fns";
-import { useTotalPageViews, useUniqueVisitors, useDailyPageViews, useChaletPageViews } from "@/admin/hooks/useAnalytics";
+import { useTotalPageViews, useUniqueVisitors, useDailyPageViews, useChaletPageViews, useSocialClicks } from "@/admin/hooks/useAnalytics";
 import AdminHeader from "@/admin/components/AdminHeader";
 import StatsCard from "@/admin/components/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, Users, Building, TrendingUp, ExternalLink } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const DATE_RANGES = [
   { label: "7 days", days: 7 },
@@ -24,8 +24,9 @@ export default function AdminDashboard() {
   const { data: uniqueVisitors, isError: visitorsError } = useUniqueVisitors(startDate, endDate);
   const { data: dailyViews, isError: dailyError } = useDailyPageViews(startDate, endDate);
   const { data: chaletViews, isError: chaletError } = useChaletPageViews(startDate, endDate);
+  const { data: socialClicks, isError: socialError } = useSocialClicks(startDate, endDate);
 
-  const hasError = viewsError || visitorsError || dailyError || chaletError;
+  const hasError = viewsError || visitorsError || dailyError || chaletError || socialError;
 
   const avgDaily = totalViews && rangeDays ? Math.round(totalViews / rangeDays) : 0;
   const topChalet = chaletViews?.[0]?.chalet_slug || "—";
@@ -43,6 +44,20 @@ export default function AdminDashboard() {
       views: d.count,
     })) || [];
   }, [chaletViews]);
+
+  const SOCIAL_COLORS: Record<string, string> = {
+    instagram: "#E1306C",
+    tiktok: "#010101",
+    facebook: "#1877F2",
+  };
+
+  const socialChartData = useMemo(() => {
+    return socialClicks?.map((d) => ({
+      name: d.platform.charAt(0).toUpperCase() + d.platform.slice(1),
+      value: d.count,
+      color: SOCIAL_COLORS[d.platform] || "#888",
+    })) || [];
+  }, [socialClicks]);
 
   return (
     <div className="flex flex-col min-w-0">
@@ -135,6 +150,42 @@ export default function AdminDashboard() {
               ) : (
                 <div className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">
                   No chalet views for this period
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card min-w-0">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Social Link Clicks</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {socialChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={socialChartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {socialChartData.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: "hsl(220 20% 14%)", border: "1px solid hsl(220 15% 25%)", borderRadius: "8px" }}
+                      labelStyle={{ color: "hsl(40 20% 90%)" }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">
+                  No social clicks for this period
                 </div>
               )}
             </CardContent>

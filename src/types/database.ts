@@ -136,6 +136,24 @@ export interface Database {
           referrer?: string | null;
         };
       };
+      social_clicks: {
+        Row: {
+          id: string;
+          platform: string;
+          session_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          platform: string;
+          session_id: string;
+          created_at?: string;
+        };
+        Update: {
+          platform?: string;
+          session_id?: string;
+        };
+      };
       site_images: {
         Row: {
           id: string;

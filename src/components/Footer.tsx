@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
 import { WA_LINK_1, WA_LINK_2 } from "@/lib/utils";
+import { trackSocialClick } from "@/lib/trackSocialClick";
 import logo from "@/assets/logo.jpeg";
 
 export default function Footer() {
@@ -39,6 +40,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
+                onClick={() => trackSocialClick("instagram")}
                 className="h-10 w-10 rounded-full text-white bg-[radial-gradient(circle_at_30%_107%,#fdf497_0%,#fdf497_5%,#fd5949_45%,#d6249f_60%,#285AEB_90%)] shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center"
               >
                 <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-current" aria-hidden="true">
@@ -50,6 +52,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
+                onClick={() => trackSocialClick("tiktok")}
                 className="h-10 w-10 rounded-full bg-black text-white shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center"
               >
                 <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-current drop-shadow-[1px_0_0_#FE2C55] drop-shadow-[-1px_0_0_#25F4EE]" aria-hidden="true">
@@ -61,6 +64,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
+                onClick={() => trackSocialClick("facebook")}
                 className="h-10 w-10 rounded-full bg-[#1877F2] text-white shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center"
               >
                 <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-current" aria-hidden="true">
