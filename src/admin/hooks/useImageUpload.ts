@@ -1,17 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { compressImage } from "@/lib/imageCompressor";
 import type { ChaletImageInsert } from "@/types/database";
 
 export function useImageUpload() {
   const queryClient = useQueryClient();
 
   const uploadImage = async (file: File, chaletId: string, displayOrder: number) => {
-    const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const compressed = await compressImage(file);
+    const fileExt = compressed.name.split(".").pop()?.toLowerCase() || "jpg";
     const fileName = `${chaletId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from("chalet-images")
-      .upload(fileName, file, { contentType: file.type, upsert: false });
+      .upload(fileName, compressed, { contentType: compressed.type, upsert: false });
     if (uploadError) throw uploadError;
 
     const { data: urlData } = supabase.storage

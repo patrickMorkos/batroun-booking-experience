@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { compressVideo } from "@/lib/videoCompressor";
+import { compressImage } from "@/lib/imageCompressor";
 import type { GalleryMedia } from "@/types/database";
 
 export function useAdminGalleryMedia() {
@@ -47,9 +49,21 @@ export function useGalleryMediaUpload() {
 
   return useMutation({
     mutationFn: async ({ file, title, onProgress }: { file: File; title?: string; onProgress?: (pct: number) => void }) => {
-      const fileExt = file.name.split(".").pop()?.toLowerCase() || "bin";
+      let processedFile = file;
+      const isVideo = file.type.startsWith("video/");
+
+      if (isVideo) {
+        onProgress?.(0);
+        processedFile = await compressVideo(file, (pct) => {
+          onProgress?.(Math.round(pct * 0.5));
+        });
+      } else {
+        processedFile = await compressImage(file);
+      }
+
+      const fileExt = processedFile.name.split(".").pop()?.toLowerCase() || "bin";
       const fileName = `gallery/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-      const type = file.type.startsWith("video/") ? "video" : "image";
+      const type = isVideo ? "video" : "image";
 
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
@@ -58,7 +72,9 @@ export function useGalleryMediaUpload() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const uploadUrl = `${supabaseUrl}/storage/v1/object/gallery-media/${fileName}`;
 
-      await uploadWithProgress(uploadUrl, file, token, onProgress);
+      await uploadWithProgress(uploadUrl, processedFile, token, (pct) => {
+        onProgress?.(isVideo ? 50 + Math.round(pct * 0.5) : pct);
+      });
 
       const { data: urlData } = supabase.storage
         .from("gallery-media")
