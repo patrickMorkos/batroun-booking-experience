@@ -1,108 +1,62 @@
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { toBlobURL, fetchFile } from "@ffmpeg/util";
+
+let ffmpeg: FFmpeg | null = null;
+
+async function getFFmpeg(onProgress?: (pct: number) => void): Promise<FFmpeg> {
+  if (ffmpeg && ffmpeg.loaded) return ffmpeg;
+
+  ffmpeg = new FFmpeg();
+
+  if (onProgress) {
+    ffmpeg.on("progress", ({ progress }) => {
+      onProgress(Math.round(progress * 100));
+    });
+  }
+
+  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+  await ffmpeg.load({
+    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+  });
+
+  return ffmpeg;
+}
+
 export async function compressVideo(
   file: File,
   onProgress?: (pct: number) => void
 ): Promise<File> {
-  const maxWidth = 1280;
-  const maxHeight = 720;
-  const videoBitrate = 2_500_000;
+  const ff = await getFFmpeg(onProgress);
 
-  const video = document.createElement("video");
-  video.muted = true;
-  video.playsInline = true;
-  video.preload = "auto";
-  video.src = URL.createObjectURL(file);
+  const inputName = "input" + getExtension(file.name);
+  const outputName = "output.mp4";
 
-  await new Promise<void>((resolve, reject) => {
-    video.onloadedmetadata = () => resolve();
-    video.onerror = () => reject(new Error("Failed to load video"));
-  });
+  await ff.writeFile(inputName, await fetchFile(file));
 
-  const duration = video.duration;
-  if (!duration || !isFinite(duration)) {
-    return file;
-  }
+  await ff.exec([
+    "-i", inputName,
+    "-vf", "scale='min(1280,iw)':'min(720,ih)':force_original_aspect_ratio=decrease",
+    "-c:v", "libx264",
+    "-preset", "fast",
+    "-crf", "28",
+    "-c:a", "aac",
+    "-b:a", "128k",
+    "-movflags", "+faststart",
+    "-y", outputName,
+  ]);
 
-  let width = video.videoWidth;
-  let height = video.videoHeight;
+  const data = await ff.readFile(outputName);
+  const blob = new Blob([data], { type: "video/mp4" });
 
-  if (width > maxWidth || height > maxHeight) {
-    const ratio = Math.min(maxWidth / width, maxHeight / height);
-    width = Math.round(width * ratio);
-    height = Math.round(height * ratio);
-  }
+  await ff.deleteFile(inputName);
+  await ff.deleteFile(outputName);
 
-  width = width % 2 === 0 ? width : width - 1;
-  height = height % 2 === 0 ? height : height - 1;
+  const newName = file.name.replace(/\.[^.]+$/, ".mp4");
+  return new File([blob], newName, { type: "video/mp4" });
+}
 
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d")!;
-
-  const stream = canvas.captureStream(30);
-
-  try {
-    const audioCtx = new AudioContext();
-    const source = audioCtx.createMediaElementSource(video);
-    const dest = audioCtx.createMediaStreamDestination();
-    source.connect(dest);
-    dest.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
-  } catch {
-    // no audio track — that's fine
-  }
-
-  const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-    ? "video/webm;codecs=vp9"
-    : MediaRecorder.isTypeSupported("video/webm;codecs=vp8")
-    ? "video/webm;codecs=vp8"
-    : "video/webm";
-
-  const recorder = new MediaRecorder(stream, {
-    mimeType,
-    videoBitsPerSecond: videoBitrate,
-  });
-
-  const chunks: Blob[] = [];
-  recorder.ondataavailable = (e) => {
-    if (e.data.size > 0) chunks.push(e.data);
-  };
-
-  const done = new Promise<Blob>((resolve) => {
-    recorder.onstop = () => {
-      resolve(new Blob(chunks, { type: mimeType.split(";")[0] }));
-    };
-  });
-
-  recorder.start(100);
-  video.currentTime = 0;
-  await video.play();
-
-  await new Promise<void>((resolve) => {
-    const draw = () => {
-      if (video.ended || video.paused) {
-        recorder.stop();
-        resolve();
-        return;
-      }
-      ctx.drawImage(video, 0, 0, width, height);
-      if (onProgress && duration) {
-        onProgress(Math.min(99, Math.round((video.currentTime / duration) * 100)));
-      }
-      requestAnimationFrame(draw);
-    };
-    video.onended = () => {
-      recorder.stop();
-      resolve();
-    };
-    draw();
-  });
-
-  const blob = await done;
-  URL.revokeObjectURL(video.src);
-
-  onProgress?.(100);
-
-  const ext = mimeType.includes("webm") ? "webm" : "mp4";
-  const newName = file.name.replace(/\.[^.]+$/, `.${ext}`);
-  return new File([blob], newName, { type: blob.type });
+function getExtension(name: string): string {
+  const dot = name.lastIndexOf(".");
+  return dot >= 0 ? name.slice(dot) : ".mp4";
 }

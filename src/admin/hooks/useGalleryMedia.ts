@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { compressVideo } from "@/lib/videoCompressor";
 import { compressImage } from "@/lib/imageCompressor";
+import { compressVideo } from "@/lib/videoCompressor";
 import type { GalleryMedia } from "@/types/database";
 
 export function useAdminGalleryMedia() {
@@ -53,7 +53,6 @@ export function useGalleryMediaUpload() {
       const isVideo = file.type.startsWith("video/");
 
       if (isVideo) {
-        onProgress?.(0);
         processedFile = await compressVideo(file, (pct) => {
           onProgress?.(Math.round(pct * 0.5));
         });
