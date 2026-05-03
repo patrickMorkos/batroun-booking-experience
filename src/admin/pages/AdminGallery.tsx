@@ -41,19 +41,32 @@ export default function AdminGallery() {
       }
       const maxSize = file.type.startsWith("video/") ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
       if (file.size > maxSize) {
-        toast.error(`"${file.name}" is too large. ${file.type.startsWith("video/") ? "Videos must be under 50MB." : "Images must be under 5MB."}`);
+        toast.error(`"${file.name}" is too large. ${file.type.startsWith("video/") ? "Videos must be under 200MB." : "Images must be under 5MB."}`);
         continue;
       }
       valid.push(file);
     }
     if (valid.length === 0) return;
     let completed = 0;
+    let failed = 0;
     for (const file of valid) {
       uploadMutation.mutate(
         { file },
         {
-          onSuccess: () => { completed++; if (completed === valid.length) toast.success(`${valid.length} file${valid.length > 1 ? "s" : ""} uploaded.`); },
-          onError: (e) => toast.error(`Failed to upload "${file.name}": ${e.message}`),
+          onSuccess: () => {
+            completed++;
+            if (completed + failed === valid.length) {
+              if (failed === 0) toast.success(`${valid.length} file${valid.length > 1 ? "s" : ""} uploaded.`);
+              else toast.warning(`${completed} uploaded, ${failed} failed.`);
+            }
+          },
+          onError: (e) => {
+            failed++;
+            toast.error(`Failed to upload "${file.name}": ${e.message}`);
+            if (completed + failed === valid.length && completed > 0) {
+              toast.warning(`${completed} uploaded, ${failed} failed.`);
+            }
+          },
         }
       );
     }
