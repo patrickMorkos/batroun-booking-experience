@@ -22,7 +22,7 @@ const ACCEPTED_TYPES = [
   "video/mp4", "video/webm", "video/quicktime",
 ];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
+const MAX_VIDEO_SIZE = 200 * 1024 * 1024;
 
 export default function AdminGallery() {
   const { data: items, isLoading } = useAdminGalleryMedia();
@@ -32,23 +32,31 @@ export default function AdminGallery() {
   const updateTitleMutation = useGalleryMediaUpdateTitle();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (file: File) => {
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast.error("Please upload a valid image or video file.");
-      return;
-    }
-    const maxSize = file.type.startsWith("video/") ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
-    if (file.size > maxSize) {
-      toast.error(file.type.startsWith("video/") ? "Video must be under 50MB." : "Image must be under 5MB.");
-      return;
-    }
-    uploadMutation.mutate(
-      { file },
-      {
-        onSuccess: () => toast.success("Media uploaded successfully."),
-        onError: (e) => toast.error(e.message),
+  const handleFiles = (files: FileList) => {
+    const valid: File[] = [];
+    for (const file of Array.from(files)) {
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        toast.error(`"${file.name}" is not a valid image or video file.`);
+        continue;
       }
-    );
+      const maxSize = file.type.startsWith("video/") ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
+      if (file.size > maxSize) {
+        toast.error(`"${file.name}" is too large. ${file.type.startsWith("video/") ? "Videos must be under 50MB." : "Images must be under 5MB."}`);
+        continue;
+      }
+      valid.push(file);
+    }
+    if (valid.length === 0) return;
+    let completed = 0;
+    for (const file of valid) {
+      uploadMutation.mutate(
+        { file },
+        {
+          onSuccess: () => { completed++; if (completed === valid.length) toast.success(`${valid.length} file${valid.length > 1 ? "s" : ""} uploaded.`); },
+          onError: (e) => toast.error(`Failed to upload "${file.name}": ${e.message}`),
+        }
+      );
+    }
   };
 
   const handleDelete = (item: GalleryMedia) => {
@@ -88,11 +96,11 @@ export default function AdminGallery() {
           <input
             ref={fileInputRef}
             type="file"
+            multiple
             accept="image/*,video/mp4,video/webm,video/quicktime"
             className="hidden"
             onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileChange(file);
+              if (e.target.files && e.target.files.length > 0) handleFiles(e.target.files);
               e.target.value = "";
             }}
           />
