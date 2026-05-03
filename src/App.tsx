@@ -21,7 +21,14 @@ const AdminUsers = lazy(() => import("@/admin/pages/AdminUsers"));
 const AdminSiteImages = lazy(() => import("@/admin/pages/AdminSiteImages"));
 const AdminGallery = lazy(() => import("@/admin/pages/AdminGallery"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnMount: "always",
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function AppShell() {
   const { pathname } = useLocation();

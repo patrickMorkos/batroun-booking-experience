@@ -32,7 +32,10 @@ export function useCreateUser() {
       const { data: result, error } = await supabase.functions.invoke("create-admin-user", {
         body: data,
       });
-      if (error) throw error;
+      if (error) {
+        const msg = result?.error || error.message || "Failed to create user";
+        throw new Error(msg);
+      }
       if (result?.error) throw new Error(result.error);
       return result;
     },
