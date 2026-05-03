@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
+import { WA_LINK_1 } from "@/lib/utils";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -88,7 +89,7 @@ export default function Navbar() {
             </Link>
           ))}
           <a
-            href="https://wa.me/96181522115"
+            href={WA_LINK_1}
             target="_blank"
             rel="noopener noreferrer"
             className="gradient-gold text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity"
@@ -115,7 +116,7 @@ export default function Navbar() {
               </button>
             ))}
             <a
-              href="https://wa.me/96181522115"
+              href={WA_LINK_1}
               target="_blank"
               rel="noopener noreferrer"
               className="gradient-gold text-primary-foreground px-5 py-3 rounded-full text-sm font-semibold text-center"

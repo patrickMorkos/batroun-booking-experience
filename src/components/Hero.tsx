@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
+import { WA_LINK_1 } from "@/lib/utils";
 
 export default function Hero() {
   const { data: images } = useSiteImages();
@@ -30,7 +31,7 @@ export default function Hero() {
             Explore Chalets
           </Link>
           <a
-            href="https://wa.me/96181522115"
+            href={WA_LINK_1}
             target="_blank"
             rel="noopener noreferrer"
             className="border-2 border-primary text-primary px-8 py-4 rounded-full text-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-all"

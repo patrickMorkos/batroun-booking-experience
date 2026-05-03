@@ -19,13 +19,21 @@ function isWeekend(date: Date): boolean {
 function calculatePrice(checkIn: Date, checkOut: Date, weekdayPrice: number, weekendPrice: number) {
   let total = 0;
   let nights = 0;
+  let weekdayNights = 0;
+  let weekendNights = 0;
   const current = new Date(checkIn);
   while (current < checkOut) {
-    total += isWeekend(current) ? weekendPrice : weekdayPrice;
+    if (isWeekend(current)) {
+      weekendNights++;
+      total += weekendPrice;
+    } else {
+      weekdayNights++;
+      total += weekdayPrice;
+    }
     nights++;
     current.setDate(current.getDate() + 1);
   }
-  return { total, nights };
+  return { total, nights, weekdayNights, weekendNights };
 }
 
 function formatDate(d: Date) {
@@ -115,9 +123,25 @@ export default function ChaletDetail() {
 
   const whatsappMessage = pricing && dateRange?.from && dateRange?.to
     ? encodeURIComponent(
-        `Hello Ô Batroun, I would like to book ${chalet.name} from ${formatDate(dateRange.from)} to ${formatDate(dateRange.to)}. Total nights: ${pricing.nights}. Estimated price: $${pricing.total}. Please confirm availability.`
+        [
+          `Hello! I'd like to book a chalet at \u00D4 Batroun Guesthouse`,
+          ``,
+          `*Chalet:* ${chalet.name}`,
+          ``,
+          `*Check-in:* ${formatDate(dateRange.from)}`,
+          `*Check-out:* ${formatDate(dateRange.to)}`,
+          `*Nights:* ${pricing.nights}`,
+          ``,
+          `*Price Breakdown:*`,
+          pricing.weekdayNights > 0 ? `  \u2022 ${pricing.weekdayNights} weekday night${pricing.weekdayNights > 1 ? "s" : ""} \u00D7 $${chalet.weekday_price} = $${pricing.weekdayNights * chalet.weekday_price}` : null,
+          pricing.weekendNights > 0 ? `  \u2022 ${pricing.weekendNights} weekend night${pricing.weekendNights > 1 ? "s" : ""} \u00D7 $${chalet.weekend_price} = $${pricing.weekendNights * chalet.weekend_price}` : null,
+          ``,
+          `*Total: $${pricing.total}*`,
+          ``,
+          `Please confirm availability. Thank you!`,
+        ].filter(Boolean).join("\n")
       )
-    : encodeURIComponent(`Hello Ô Batroun, I am interested in booking ${chalet.name}. Please share availability.`);
+    : encodeURIComponent(`Hello! I'd like to book a chalet at \u00D4 Batroun Guesthouse\n\nI'm interested in *${chalet.name}*. Please share availability.`);
 
   const openFullscreenAt = (index: number) => {
     setActiveIndex(index);

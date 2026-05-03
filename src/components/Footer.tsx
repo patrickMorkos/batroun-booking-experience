@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
+import { WA_LINK_1, WA_LINK_2 } from "@/lib/utils";
 
 export default function Footer() {
   const { data: images } = useSiteImages();
@@ -67,7 +68,7 @@ export default function Footer() {
               </a>
               <div className="relative">
                 <a
-                  href="https://wa.me/96181522115"
+                  href={WA_LINK_1}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="WhatsApp 1"
@@ -81,7 +82,7 @@ export default function Footer() {
               </div>
               <div className="relative">
                 <a
-                  href="https://wa.me/96176363237"
+                  href={WA_LINK_2}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="WhatsApp 2"

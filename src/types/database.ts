@@ -161,6 +161,33 @@ export interface Database {
           updated_at?: string;
         };
       };
+      gallery_media: {
+        Row: {
+          id: string;
+          url: string;
+          storage_path: string;
+          type: string;
+          title: string;
+          display_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          url: string;
+          storage_path: string;
+          type?: string;
+          title?: string;
+          display_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          url?: string;
+          storage_path?: string;
+          type?: string;
+          title?: string;
+          display_order?: number;
+        };
+      };
     };
     Functions: {
       get_daily_page_views: {
@@ -191,3 +218,7 @@ export type SiteImage = Database["public"]["Tables"]["site_images"]["Row"];
 export type SiteImageInsert = Database["public"]["Tables"]["site_images"]["Insert"];
 export type SiteImageUpdate = Database["public"]["Tables"]["site_images"]["Update"];
 export type SiteImageSlot = "hero_bg" | "logo" | "amenity_pool" | "amenity_lobby" | "nearby";
+
+export type GalleryMedia = Database["public"]["Tables"]["gallery_media"]["Row"];
+export type GalleryMediaInsert = Database["public"]["Tables"]["gallery_media"]["Insert"];
+export type GalleryMediaUpdate = Database["public"]["Tables"]["gallery_media"]["Update"];

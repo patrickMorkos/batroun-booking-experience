@@ -1,6 +1,7 @@
 import { Phone, MapPin } from "lucide-react";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
+import { WA_LINK_1 } from "@/lib/utils";
 
 export default function Contact() {
   const { data: images } = useSiteImages();
@@ -59,7 +60,7 @@ export default function Contact() {
 
           <div className="mt-8 flex flex-wrap gap-4 justify-center">
             <a
-              href="https://wa.me/96181522115"
+              href={WA_LINK_1}
               target="_blank"
               rel="noopener noreferrer"
               className="gradient-gold text-primary-foreground px-8 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity"

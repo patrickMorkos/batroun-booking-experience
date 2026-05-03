@@ -19,6 +19,7 @@ const AdminChalets = lazy(() => import("@/admin/pages/AdminChalets"));
 const AdminChaletEdit = lazy(() => import("@/admin/pages/AdminChaletEdit"));
 const AdminUsers = lazy(() => import("@/admin/pages/AdminUsers"));
 const AdminSiteImages = lazy(() => import("@/admin/pages/AdminSiteImages"));
+const AdminGallery = lazy(() => import("@/admin/pages/AdminGallery"));
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ function AppShell() {
           <Route path="/admin/chalets/:id" element={<Suspense fallback={<AdminFallback />}><AdminChaletEdit /></Suspense>} />
           <Route path="/admin/users" element={<Suspense fallback={<AdminFallback />}><AdminUsers /></Suspense>} />
           <Route path="/admin/site-images" element={<Suspense fallback={<AdminFallback />}><AdminSiteImages /></Suspense>} />
+          <Route path="/admin/gallery" element={<Suspense fallback={<AdminFallback />}><AdminGallery /></Suspense>} />
         </Route>
       </Route>
 

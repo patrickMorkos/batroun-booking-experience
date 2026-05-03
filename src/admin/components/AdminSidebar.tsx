@@ -11,13 +11,15 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Building, Users, ImageIcon, ExternalLink, LogOut } from "lucide-react";
+import { LayoutDashboard, Building, Users, ImageIcon, ExternalLink, LogOut, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/admin" },
   { title: "Chalets", icon: Building, path: "/admin/chalets" },
+  { title: "Gallery", icon: Film, path: "/admin/gallery" },
   { title: "Site Images", icon: ImageIcon, path: "/admin/site-images" },
   { title: "Users", icon: Users, path: "/admin/users" },
 ];
@@ -25,6 +27,7 @@ const menuItems = [
 export default function AdminSidebar() {
   const { pathname } = useLocation();
   const { profile, signOut } = useAuth();
+  const { setOpenMobile } = useSidebar();
 
   const isActive = (path: string) => {
     if (path === "/admin") return pathname === "/admin";
@@ -53,7 +56,7 @@ export default function AdminSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton asChild isActive={isActive(item.path)}>
-                    <Link to={item.path}>
+                    <Link to={item.path} onClick={() => setOpenMobile(false)}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
