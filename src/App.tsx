@@ -20,6 +20,7 @@ const AdminChaletEdit = lazy(() => import("@/admin/pages/AdminChaletEdit"));
 const AdminUsers = lazy(() => import("@/admin/pages/AdminUsers"));
 const AdminSiteImages = lazy(() => import("@/admin/pages/AdminSiteImages"));
 const AdminGallery = lazy(() => import("@/admin/pages/AdminGallery"));
+const AdminExtras = lazy(() => import("@/admin/pages/AdminExtras"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +58,7 @@ function AppShell() {
           <Route path="/admin/users" element={<Suspense fallback={<AdminFallback />}><AdminUsers /></Suspense>} />
           <Route path="/admin/site-images" element={<Suspense fallback={<AdminFallback />}><AdminSiteImages /></Suspense>} />
           <Route path="/admin/gallery" element={<Suspense fallback={<AdminFallback />}><AdminGallery /></Suspense>} />
+          <Route path="/admin/extras" element={<Suspense fallback={<AdminFallback />}><AdminExtras /></Suspense>} />
         </Route>
       </Route>
 

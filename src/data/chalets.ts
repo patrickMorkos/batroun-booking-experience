@@ -1,13 +1,5 @@
 export const includedAmenities = ["Soap", "Shampoo", "Shower gel", "Towels"];
 
-export const extras = [
-  { name: "Dental Kit", available: true },
-  { name: "Shisha / Hooka", available: true },
-  { name: "Loofa", available: true },
-  { name: "Snack Menu", available: false, note: "Coming Soon" },
-  { name: "Bar Menu", available: false, note: "Coming Soon" },
-];
-
 export const sharedAmenities = [
   { name: "Shared Pool", icon: "🏊" },
   { name: "Private Pool", icon: "🏖️" },

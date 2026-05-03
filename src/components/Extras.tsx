@@ -1,7 +1,10 @@
-import { extras, includedAmenities } from "@/data/chalets";
+import { includedAmenities } from "@/data/chalets";
+import { useExtras } from "@/hooks/useExtras";
 import { Check, Clock } from "lucide-react";
 
 export default function Extras() {
+  const { data: extras } = useExtras();
+
   return (
     <section className="py-20 px-4 bg-card/50">
       <div className="container mx-auto">
@@ -27,16 +30,19 @@ export default function Extras() {
           <div>
             <h3 className="font-heading text-2xl font-semibold text-foreground mb-6">Extras & Add-ons</h3>
             <div className="space-y-3">
-              {extras.map((e) => (
-                <div key={e.name} className="flex items-center gap-3 text-foreground">
+              {extras?.map((e) => (
+                <div key={e.id} className="flex items-center gap-3 text-foreground">
                   {e.available ? (
                     <Check size={18} className="text-primary flex-shrink-0" />
                   ) : (
                     <Clock size={18} className="text-muted-foreground flex-shrink-0" />
                   )}
                   <span>{e.name}</span>
+                  {e.available && e.price > 0 && (
+                    <span className="text-xs font-semibold bg-primary/20 text-primary px-2 py-0.5 rounded-full">${e.price}</span>
+                  )}
                   {e.note && (
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{e.note}</span>
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{e.note}</span>
                   )}
                 </div>
               ))}

@@ -14,7 +14,7 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Building, Users, ImageIcon, ExternalLink, LogOut, Film, Loader2 } from "lucide-react";
+import { LayoutDashboard, Building, Users, ImageIcon, ExternalLink, LogOut, Film, Loader2, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
@@ -22,6 +22,7 @@ const menuItems = [
   { title: "Chalets", icon: Building, path: "/admin/chalets" },
   { title: "Gallery", icon: Film, path: "/admin/gallery" },
   { title: "Site Images", icon: ImageIcon, path: "/admin/site-images" },
+  { title: "Extras", icon: Gift, path: "/admin/extras" },
   { title: "Users", icon: Users, path: "/admin/users" },
 ];
 
