@@ -1,10 +1,21 @@
 import { sharedAmenities } from "@/data/chalets";
-import poolImg from "@/assets/pool.jpg";
-import lobbyImg from "@/assets/lobby.jpg";
-
-const images = [poolImg, lobbyImg];
+import { useSiteImages } from "@/hooks/useSiteImages";
+import { SLOT_MAP } from "@/lib/siteImageSlots";
 
 export default function Amenities() {
+  const { data: siteImages } = useSiteImages();
+
+  const images = [
+    {
+      src: siteImages?.amenity_pool.url ?? SLOT_MAP.amenity_pool.fallback,
+      alt: siteImages?.amenity_pool.alt ?? SLOT_MAP.amenity_pool.defaultAlt,
+    },
+    {
+      src: siteImages?.amenity_lobby.url ?? SLOT_MAP.amenity_lobby.fallback,
+      alt: siteImages?.amenity_lobby.alt ?? SLOT_MAP.amenity_lobby.defaultAlt,
+    },
+  ];
+
   return (
     <section id="amenities" className="py-20 px-4">
       <div className="container mx-auto">
@@ -33,8 +44,8 @@ export default function Amenities() {
           {images.map((img, i) => (
             <div key={i} className="rounded-2xl overflow-hidden group">
               <img
-                src={img}
-                alt="Amenity"
+                src={img.src}
+                alt={img.alt}
                 className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
                 width={800}

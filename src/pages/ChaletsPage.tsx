@@ -1,8 +1,18 @@
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import ChaletsList from "@/components/ChaletsList";
 import Footer from "@/components/Footer";
 
 export default function ChaletsPage() {
+  useEffect(() => {
+    // Run after mount to override browser history scroll restoration.
+    const timer = window.setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

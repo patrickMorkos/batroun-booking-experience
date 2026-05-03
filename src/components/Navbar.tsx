@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { useSiteImages } from "@/hooks/useSiteImages";
+import { SLOT_MAP } from "@/lib/siteImageSlots";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Chalets", href: "/chalets" },
+  { label: "Chalets", href: "/#chalets" },
   { label: "Amenities", href: "/#amenities" },
   { label: "Nearby", href: "/#nearby" },
   { label: "Contact", href: "/#contact" },
@@ -15,6 +16,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { data: images } = useSiteImages();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -24,7 +26,29 @@ export default function Navbar() {
 
   useEffect(() => setOpen(false), [location]);
 
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const id = location.hash.slice(1);
+    const timer = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [location.pathname, location.hash]);
+
   const handleClick = (href: string) => {
+    if (href === "/") {
+      if (location.pathname === "/") {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+        if (location.hash) {
+          window.history.replaceState(null, "", "/");
+        }
+      }
+      setOpen(false);
+      return;
+    }
+
     if (href.startsWith("/#")) {
       const id = href.slice(2);
       if (location.pathname === "/") {
@@ -41,8 +65,8 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between py-3 px-4">
-        <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="Ô Batroun" className="h-12 w-12 rounded-full" />
+        <Link to="/" onClick={() => handleClick("/")} className="flex items-center gap-3">
+          <img src={images?.logo.url ?? SLOT_MAP.logo.fallback} alt={images?.logo.alt ?? SLOT_MAP.logo.defaultAlt} className="h-12 w-12 rounded-full" />
           <span className="font-heading text-xl font-semibold text-primary">Ô Batroun</span>
         </Link>
 
@@ -61,6 +85,7 @@ export default function Navbar() {
               <Link
                 key={l.label}
                 to={l.href}
+                onClick={() => handleClick(l.href)}
                 className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
               >
                 {l.label}

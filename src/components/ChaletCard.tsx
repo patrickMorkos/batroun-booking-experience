@@ -1,25 +1,33 @@
 import { Link } from "react-router-dom";
-import type { Chalet } from "@/data/chalets";
 import { Users } from "lucide-react";
+import type { ChaletWithImages } from "@/types/database";
 
 interface Props {
-  chalet: Chalet;
+  chalet: ChaletWithImages;
 }
 
 export default function ChaletCard({ chalet }: Props) {
+  const primaryImage = chalet.chalet_images?.find((img) => img.is_primary) || chalet.chalet_images?.[0];
+
   return (
     <div className="bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/50 transition-all hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 group">
       <div className="relative overflow-hidden h-56">
-        <img
-          src={chalet.image}
-          alt={chalet.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-          loading="lazy"
-          width={800}
-          height={600}
-        />
+        {primaryImage ? (
+          <img
+            src={primaryImage.url}
+            alt={chalet.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            loading="lazy"
+            width={800}
+            height={600}
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground">
+            No image
+          </div>
+        )}
         <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm text-primary font-semibold px-3 py-1 rounded-full text-sm">
-          From ${chalet.weekdayPrice}/night
+          From ${chalet.weekday_price}/night
         </div>
       </div>
       <div className="p-6">

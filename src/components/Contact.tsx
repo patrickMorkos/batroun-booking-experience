@@ -1,7 +1,10 @@
 import { Phone, MapPin } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { useSiteImages } from "@/hooks/useSiteImages";
+import { SLOT_MAP } from "@/lib/siteImageSlots";
 
 export default function Contact() {
+  const { data: images } = useSiteImages();
+
   return (
     <section id="contact" className="py-20 px-4 bg-card/50">
       <div className="container mx-auto">
@@ -16,7 +19,7 @@ export default function Contact() {
 
         <div className="max-w-2xl mx-auto bg-card rounded-2xl border border-border p-8 md:p-12">
           <div className="flex justify-center mb-8">
-            <img src={logo} alt="Ô Batroun" className="w-20 h-20 rounded-full" />
+            <img src={images?.logo.url ?? SLOT_MAP.logo.fallback} alt={images?.logo.alt ?? SLOT_MAP.logo.defaultAlt} className="w-20 h-20 rounded-full" />
           </div>
 
           <div className="space-y-6">
@@ -27,7 +30,7 @@ export default function Contact() {
               <div>
                 <p className="text-sm text-muted-foreground">WhatsApp / Phone</p>
                 <a href="tel:+96181522115" className="text-foreground font-medium hover:text-primary transition-colors">
-                  +961 81 522 115
+                  81 522 115
                 </a>
                 <span className="mx-2 text-muted-foreground">|</span>
                 <a href="tel:+96176363237" className="text-foreground font-medium hover:text-primary transition-colors">
@@ -42,7 +45,14 @@ export default function Contact() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Location</p>
-                <p className="text-foreground font-medium">Batroun, Lebanon</p>
+                <a
+                  href="https://maps.app.goo.gl/yZyWJ8U6xrtWazGF9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground font-medium hover:text-primary transition-colors"
+                >
+                  Batroun, Lebanon
+                </a>
               </div>
             </div>
           </div>

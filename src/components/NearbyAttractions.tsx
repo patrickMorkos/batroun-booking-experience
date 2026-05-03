@@ -1,7 +1,10 @@
 import { nearbyPlaces } from "@/data/chalets";
-import batrounImg from "@/assets/batroun-town.jpg";
+import { useSiteImages } from "@/hooks/useSiteImages";
+import { SLOT_MAP } from "@/lib/siteImageSlots";
 
 export default function NearbyAttractions() {
+  const { data: images } = useSiteImages();
+
   return (
     <section id="nearby" className="py-20 px-4">
       <div className="container mx-auto">
@@ -17,8 +20,8 @@ export default function NearbyAttractions() {
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div className="rounded-2xl overflow-hidden">
             <img
-              src={batrounImg}
-              alt="Batroun Town"
+              src={images?.nearby.url ?? SLOT_MAP.nearby.fallback}
+              alt={images?.nearby.alt ?? SLOT_MAP.nearby.defaultAlt}
               className="w-full h-full object-cover min-h-[300px]"
               loading="lazy"
               width={800}

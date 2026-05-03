@@ -2,6 +2,10 @@ import chalet101 from "@/assets/chalet-101.jpg";
 import chalet201 from "@/assets/chalet-201.jpg";
 import chalet202 from "@/assets/chalet-202.jpg";
 import chaletPrivate from "@/assets/chalet-private.jpg";
+import heroBg from "@/assets/hero-bg.jpg";
+import lobby from "@/assets/lobby.jpg";
+import pool from "@/assets/pool.jpg";
+import batrounTown from "@/assets/batroun-town.jpg";
 
 export interface Chalet {
   id: string;
@@ -10,12 +14,15 @@ export interface Chalet {
   tagline: string;
   capacity?: number | string;
   image: string;
+  images: string[];
   features: string[];
   weekdayPrice: number;
   weekendPrice: number;
   checkIn: string;
   checkOut: string;
 }
+
+const localGallery = (primary: string, secondary: string) => [primary, secondary, pool, lobby, batrounTown, heroBg].slice(0, 5);
 
 export const chalets: Chalet[] = [
   {
@@ -25,6 +32,7 @@ export const chalets: Chalet[] = [
     tagline: "Comfortable and modern stay in Batroun",
     capacity: "4-5",
     image: chalet101,
+    images: localGallery(chalet101, chalet202),
     features: [
       "Up to 4-5 sleeping",
       "One bedroom with queen-size bed",
@@ -50,6 +58,7 @@ export const chalets: Chalet[] = [
     tagline: "Comfortable and modern stay in Batroun",
     capacity: "4-5",
     image: chalet101,
+    images: localGallery(chalet101, chalet202),
     features: [
       "Up to 4-5 sleeping",
       "One bedroom with queen-size bed",
@@ -75,6 +84,7 @@ export const chalets: Chalet[] = [
     tagline: "Comfortable and modern stay in Batroun",
     capacity: "4-5",
     image: chalet101,
+    images: localGallery(chalet101, chalet202),
     features: [
       "Up to 4-5 sleeping",
       "One bedroom with queen-size bed",
@@ -100,6 +110,7 @@ export const chalets: Chalet[] = [
     tagline: "A refined stay in the heart of Batroun",
     capacity: 12,
     image: chalet201,
+    images: localGallery(chalet201, chaletPrivate),
     features: [
       "Up to 12 sleeping",
       "Three elegant bedrooms (one master, two with two single beds each)",
@@ -126,6 +137,7 @@ export const chalets: Chalet[] = [
     tagline: "An elegant retreat in the heart of Batroun",
     capacity: 3,
     image: chalet202,
+    images: localGallery(chalet202, chalet101),
     features: [
       "Up to 3 sleeping",
       "Queen-size bed",
@@ -150,6 +162,7 @@ export const chalets: Chalet[] = [
     tagline: "A stylish escape in the heart of Batroun",
     capacity: "7-8",
     image: chalet202,
+    images: localGallery(chalet202, chalet101),
     features: [
       "Up to 7-8 sleeping",
       "Two elegant bedrooms",
@@ -178,6 +191,7 @@ export const chalets: Chalet[] = [
     tagline: "An exclusive retreat in the heart of Batroun",
     capacity: 3,
     image: chalet202,
+    images: localGallery(chalet202, chalet101),
     features: [
       "Up to 3 sleeping",
       "Elegant bedroom with queen-size bed",
@@ -204,6 +218,7 @@ export const chalets: Chalet[] = [
     tagline: "A cozy and stylish studio in the heart of Batroun",
     capacity: 3,
     image: chalet202,
+    images: localGallery(chalet202, chalet101),
     features: [
       "Up to 3 sleeping",
       "Studio bedroom with queen-size bed",
@@ -228,6 +243,7 @@ export const chalets: Chalet[] = [
     slug: "private",
     tagline: "Exclusive family chalet with private pool",
     image: chaletPrivate,
+    images: localGallery(chaletPrivate, chalet201),
     features: [
       "2 bedrooms",
       "Private pool",
@@ -247,9 +263,10 @@ export const includedAmenities = ["Soap", "Shampoo", "Shower gel", "Towels"];
 
 export const extras = [
   { name: "Dental Kit", available: true },
-  { name: "Shisha / Chicha", available: true },
+  { name: "Shisha / Hooka", available: true },
   { name: "Loofa", available: true },
   { name: "Snack Menu", available: false, note: "Coming Soon" },
+  { name: "Bar Menu", available: false, note: "Coming Soon" },
 ];
 
 export const sharedAmenities = [
