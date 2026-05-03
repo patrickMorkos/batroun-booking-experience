@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
@@ -16,6 +16,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: images } = useSiteImages();
 
   useEffect(() => {
@@ -37,15 +38,18 @@ export default function Navbar() {
     return () => window.clearTimeout(timer);
   }, [location.pathname, location.hash]);
 
-  const handleClick = (href: string) => {
+  const handleClick = useCallback((href: string) => {
+    setOpen(false);
+
     if (href === "/") {
       if (location.pathname === "/") {
         window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         if (location.hash) {
           window.history.replaceState(null, "", "/");
         }
+        return;
       }
-      setOpen(false);
+      navigate("/");
       return;
     }
 
@@ -53,10 +57,12 @@ export default function Navbar() {
       const id = href.slice(2);
       if (location.pathname === "/") {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        window.history.replaceState(null, "", href);
+        return;
       }
+      navigate(href);
     }
-    setOpen(false);
-  };
+  }, [location.pathname, location.hash, navigate]);
 
   return (
     <nav
@@ -71,27 +77,16 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((l) =>
-            l.href.startsWith("/#") ? (
-              <Link
-                key={l.label}
-                to={l.href}
-                onClick={() => handleClick(l.href)}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-              >
-                {l.label}
-              </Link>
-            ) : (
-              <Link
-                key={l.label}
-                to={l.href}
-                onClick={() => handleClick(l.href)}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-              >
-                {l.label}
-              </Link>
-            )
-          )}
+          {navLinks.map((l) => (
+            <Link
+              key={l.label}
+              to={l.href}
+              onClick={(e) => { e.preventDefault(); handleClick(l.href); }}
+              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+            >
+              {l.label}
+            </Link>
+          ))}
           <a
             href="https://wa.me/96181522115"
             target="_blank"
@@ -111,14 +106,13 @@ export default function Navbar() {
         <div className="md:hidden bg-background/98 backdrop-blur-md border-t border-border">
           <div className="flex flex-col p-4 gap-4">
             {navLinks.map((l) => (
-              <Link
+              <button
                 key={l.label}
-                to={l.href}
                 onClick={() => handleClick(l.href)}
-                className="text-foreground/80 hover:text-primary transition-colors py-2"
+                className="text-left text-foreground/80 hover:text-primary transition-colors py-2"
               >
                 {l.label}
-              </Link>
+              </button>
             ))}
             <a
               href="https://wa.me/96181522115"
