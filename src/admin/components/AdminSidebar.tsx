@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/admin/hooks/useAuth";
 import {
@@ -13,7 +14,7 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Building, Users, ImageIcon, ExternalLink, LogOut, Film } from "lucide-react";
+import { LayoutDashboard, Building, Users, ImageIcon, ExternalLink, LogOut, Film, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
@@ -28,6 +29,12 @@ export default function AdminSidebar() {
   const { pathname } = useLocation();
   const { profile, signOut } = useAuth();
   const { setOpenMobile } = useSidebar();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setLoggingOut(true);
+    await signOut();
+  };
 
   const isActive = (path: string) => {
     if (path === "/admin") return pathname === "/admin";
@@ -92,8 +99,8 @@ export default function AdminSidebar() {
             </p>
             <p className="truncate text-xs text-muted-foreground">{profile?.email}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
-            <LogOut className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={handleSignOut} disabled={loggingOut} title="Sign out">
+            {loggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
           </Button>
         </div>
       </SidebarFooter>

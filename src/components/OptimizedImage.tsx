@@ -29,7 +29,8 @@ export default function OptimizedImage({
         height={height}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
+        // @ts-expect-error React 18 doesn't type lowercase fetchpriority
+        fetchpriority={priority ? "high" : "auto"}
         className={`w-full h-full object-cover ${className}`}
       />
     </div>

@@ -73,16 +73,6 @@ export default function AdminDashboard() {
               {range.label}
             </Button>
           ))}
-          <a
-            href="https://vercel.com/patrickmorcos-projects/batroun-booking-experience/analytics"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button variant="outline" size="sm" className="ml-2">
-              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-              Vercel Analytics
-            </Button>
-          </a>
         </div>
       </AdminHeader>
 

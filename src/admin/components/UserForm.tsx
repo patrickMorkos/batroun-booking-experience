@@ -9,16 +9,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Loader2 } from "lucide-react";
 import type { Profile } from "@/types/database";
 
-const userSchema = z.object({
+const baseSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email required"),
   phone: z.string().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters").optional(),
   role: z.enum(["admin", "super_admin"]),
 });
 
-export type UserFormValues = z.infer<typeof userSchema>;
+const createSchema = baseSchema.extend({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const editSchema = baseSchema.extend({
+  password: z.string().optional(),
+});
+
+export type UserFormValues = z.infer<typeof createSchema>;
 
 interface UserFormProps {
   open: boolean;
@@ -32,9 +39,7 @@ export default function UserForm({ open, onClose, onSubmit, user, isSubmitting }
   const isEdit = !!user;
 
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(
-      isEdit ? userSchema.omit({ password: true }) : userSchema.extend({ password: z.string().min(6, "Password must be at least 6 characters") })
-    ),
+    resolver: zodResolver(isEdit ? editSchema : createSchema),
     defaultValues: {
       first_name: user?.first_name || "",
       last_name: user?.last_name || "",
@@ -45,9 +50,9 @@ export default function UserForm({ open, onClose, onSubmit, user, isSubmitting }
     },
   });
 
-  const handleSubmit = (data: UserFormValues) => {
+  const handleSubmit = form.handleSubmit((data: UserFormValues) => {
     onSubmit(data);
-  };
+  });
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -56,7 +61,14 @@ export default function UserForm({ open, onClose, onSubmit, user, isSubmitting }
           <DialogTitle>{isEdit ? "Edit User" : "Create New Admin"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSubmit(e);
+            }}
+            className="space-y-4"
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
@@ -136,7 +148,7 @@ export default function UserForm({ open, onClose, onSubmit, user, isSubmitting }
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />

@@ -51,6 +51,10 @@ export default function ChaletDetail() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
 
+  const { elRef: swipeRef, onTouchStart, onTouchMove, onTouchEnd } = useSwipeDismiss(
+    () => setIsFullscreenOpen(false)
+  );
+
   const images = useMemo(() => {
     if (!chalet?.chalet_images) return [];
     return [...chalet.chalet_images].sort((a, b) => a.display_order - b.display_order);
@@ -162,10 +166,6 @@ export default function ChaletDetail() {
     setIsFullscreenOpen(true);
     galleryApi?.scrollTo(index);
   };
-
-  const { elRef: swipeRef, onTouchStart, onTouchMove, onTouchEnd } = useSwipeDismiss(
-    () => setIsFullscreenOpen(false)
-  );
 
   return (
     <div className="min-h-screen bg-background">
