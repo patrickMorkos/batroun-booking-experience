@@ -20,13 +20,14 @@ export default function Hero() {
           height={1080}
           loading="eager"
           decoding="async"
-          fetchPriority="high"
+          // @ts-expect-error React 18 lowercase attr
+          fetchpriority="high"
         />
         <div className="absolute inset-0 bg-background/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
       </div>
 
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto fade-in">
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto fade-in pt-[50vh] -mt-32">
         <img
           src={logo}
           alt="Ô Batroun Guesthouse"
@@ -35,7 +36,8 @@ export default function Hero() {
           height={256}
           loading="eager"
           decoding="async"
-          fetchPriority="high"
+          // @ts-expect-error React 18 lowercase attr
+          fetchpriority="high"
         />
         <h1 className="font-heading text-5xl md:text-7xl font-bold mb-4">
           <span className="text-foreground">Ô Batroun</span>{" "}
@@ -62,11 +64,6 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-primary/50 rounded-full flex justify-center pt-2">
-          <div className="w-1.5 h-3 bg-primary/50 rounded-full" />
-        </div>
-      </div>
     </section>
   );
 }
