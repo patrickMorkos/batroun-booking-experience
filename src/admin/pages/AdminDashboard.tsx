@@ -5,7 +5,7 @@ import AdminHeader from "@/admin/components/AdminHeader";
 import StatsCard from "@/admin/components/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, Users, Building, TrendingUp } from "lucide-react";
+import { Eye, Users, Building, TrendingUp, ExternalLink } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const DATE_RANGES = [
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   return (
     <div className="flex flex-col">
       <AdminHeader title="Dashboard">
-        <div className="flex gap-1">
+        <div className="flex gap-1 items-center">
           {DATE_RANGES.map((range) => (
             <Button
               key={range.days}
@@ -56,6 +56,16 @@ export default function AdminDashboard() {
               {range.label}
             </Button>
           ))}
+          <a
+            href="https://vercel.com/patrickmorcos-projects/batroun-booking-experience/analytics"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" size="sm" className="ml-2">
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+              Vercel Analytics
+            </Button>
+          </a>
         </div>
       </AdminHeader>
 

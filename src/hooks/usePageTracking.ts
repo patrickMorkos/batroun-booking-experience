@@ -29,6 +29,8 @@ export function usePageTracking() {
       session_id: getSessionId(),
       user_agent: navigator.userAgent,
       referrer: document.referrer || null,
+    }).then(({ error }) => {
+      if (error) console.error("[PageTracking] insert failed:", error.message);
     });
   }, [pathname]);
 }
