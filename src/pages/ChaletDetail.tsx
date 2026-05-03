@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Check, ArrowLeft, Clock, Users, MessageCircle } from "lucide-react";
+import OptimizedImage from "@/components/OptimizedImage";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { DateRange } from "react-day-picker";
@@ -190,13 +191,14 @@ export default function ChaletDetail() {
                             onClick={() => openFullscreenAt(index)}
                             className="w-full rounded-2xl overflow-hidden border border-border/60"
                           >
-                            <img
+                            <OptimizedImage
                               src={image.url}
                               alt={`${chalet.name} photo ${index + 1}`}
-                              className="w-full h-80 md:h-[450px] object-cover"
                               width={1600}
                               height={1000}
-                              loading={index === 0 ? "eager" : "lazy"}
+                              priority={index === 0}
+                              sizes="(max-width: 768px) 100vw, 50vw"
+                              containerClassName="w-full h-80 md:h-[450px]"
                             />
                           </button>
                         </CarouselItem>
@@ -229,8 +231,7 @@ export default function ChaletDetail() {
                               src={image.url}
                               alt={`${chalet.name} fullscreen ${index + 1}`}
                               className="max-h-screen w-full object-contain"
-                              width={1600}
-                              height={1000}
+                              decoding="async"
                             />
                           </div>
                         </CarouselItem>

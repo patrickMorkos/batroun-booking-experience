@@ -3,6 +3,8 @@ import { sharedAmenities } from "@/data/chalets";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { useGalleryMedia } from "@/hooks/useGalleryMedia";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
+import OptimizedImage from "@/components/OptimizedImage";
+import LazyVideo from "@/components/LazyVideo";
 import {
   Carousel,
   CarouselContent,
@@ -110,20 +112,19 @@ export default function Amenities() {
                       className="w-full rounded-2xl overflow-hidden border border-border/60 cursor-pointer"
                     >
                       {item.type === "video" ? (
-                        <video
+                        <LazyVideo
                           src={item.url}
                           className="w-full h-80 md:h-[450px] object-cover"
-                          muted
-                          loop
-                          autoPlay
-                          playsInline
                         />
                       ) : (
-                        <img
+                        <OptimizedImage
                           src={item.url}
                           alt={item.title || "Gallery"}
-                          className="w-full h-80 md:h-[450px] object-cover"
-                          loading={index === 0 ? "eager" : "lazy"}
+                          width={1200}
+                          height={450}
+                          priority={index === 0}
+                          sizes="(max-width: 768px) 100vw, 800px"
+                          containerClassName="w-full h-80 md:h-[450px]"
                         />
                       )}
                     </button>
@@ -159,12 +160,14 @@ export default function Amenities() {
                               controls
                               autoPlay
                               playsInline
+                              preload="metadata"
                             />
                           ) : (
                             <img
                               src={item.url}
                               alt={item.title || "Gallery"}
                               className="max-h-screen w-full object-contain"
+                              decoding="async"
                             />
                           )}
                         </div>
@@ -181,13 +184,14 @@ export default function Amenities() {
           <div className="grid md:grid-cols-2 gap-6">
             {fallbackImages.map((img, i) => (
               <div key={i} className="rounded-2xl overflow-hidden group">
-                <img
+                <OptimizedImage
                   src={img.src}
                   alt={img.alt}
-                  className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
                   width={800}
                   height={600}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="group-hover:scale-105 transition-transform duration-500"
+                  containerClassName="w-full h-64 md:h-80"
                 />
               </div>
             ))}

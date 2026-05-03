@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
 import { WA_LINK_1 } from "@/lib/utils";
+import logo from "@/assets/logo.jpeg";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -73,7 +74,7 @@ export default function Navbar() {
     >
       <div className="container mx-auto flex items-center justify-between py-3 px-4">
         <Link to="/" onClick={() => handleClick("/")} className="flex items-center gap-3">
-          <img src={images?.logo.url ?? SLOT_MAP.logo.fallback} alt={images?.logo.alt ?? SLOT_MAP.logo.defaultAlt} className="h-12 w-12 rounded-full" />
+          <img src={logo} alt="Ô Batroun Guesthouse" className="h-12 w-12 rounded-full" />
           <span className="font-heading text-xl font-semibold text-primary">Ô Batroun</span>
         </Link>
 

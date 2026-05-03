@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
 import { WA_LINK_1, WA_LINK_2 } from "@/lib/utils";
+import logo from "@/assets/logo.jpeg";
 
 export default function Footer() {
   const { data: images } = useSiteImages();
@@ -12,7 +13,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-8 mb-8 text-center">
           <div className="flex flex-col items-center">
             <Link to="/" className="flex items-center gap-3 mb-4 justify-center">
-              <img src={images?.logo.url ?? SLOT_MAP.logo.fallback} alt={images?.logo.alt ?? SLOT_MAP.logo.defaultAlt} className="h-10 w-10 rounded-full" />
+              <img src={logo} alt="Ô Batroun Guesthouse" className="h-10 w-10 rounded-full" />
               <span className="font-heading text-lg font-semibold text-primary">Ô Batroun</span>
             </Link>
             <p className="text-sm text-muted-foreground">

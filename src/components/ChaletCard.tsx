@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Users } from "lucide-react";
+import OptimizedImage from "@/components/OptimizedImage";
 import type { ChaletWithImages } from "@/types/database";
 
 interface Props {
@@ -13,13 +14,14 @@ export default function ChaletCard({ chalet }: Props) {
     <div className="bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/50 transition-all hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 group">
       <div className="relative overflow-hidden h-56">
         {primaryImage ? (
-          <img
+          <OptimizedImage
             src={primaryImage.url}
             alt={chalet.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            loading="lazy"
             width={800}
             height={600}
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="group-hover:scale-110 transition-transform duration-700"
+            containerClassName="w-full h-full"
           />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground">

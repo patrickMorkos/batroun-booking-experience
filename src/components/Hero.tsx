@@ -2,20 +2,41 @@ import { Link } from "react-router-dom";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
 import { WA_LINK_1 } from "@/lib/utils";
+import logo from "@/assets/logo.jpeg";
 
 export default function Hero() {
   const { data: images } = useSiteImages();
 
+  const heroBgUrl = images?.hero_bg.url ?? SLOT_MAP.hero_bg.fallback;
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={images?.hero_bg.url ?? SLOT_MAP.hero_bg.fallback} alt={images?.hero_bg.alt ?? SLOT_MAP.hero_bg.defaultAlt} className="w-full h-full object-cover" width={1920} height={1080} />
+        <img
+          src={heroBgUrl}
+          alt={images?.hero_bg.alt ?? SLOT_MAP.hero_bg.defaultAlt}
+          className="w-full h-full object-cover"
+          width={1920}
+          height={1080}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
         <div className="absolute inset-0 bg-background/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto fade-in">
-        <img src={images?.logo.url ?? SLOT_MAP.logo.fallback} alt={images?.logo.alt ?? SLOT_MAP.logo.defaultAlt} className="w-28 h-28 mx-auto mb-6 rounded-full shadow-2xl" />
+        <img
+          src={logo}
+          alt="Ô Batroun Guesthouse"
+          className="w-28 h-28 mx-auto mb-6 rounded-full shadow-2xl"
+          width={256}
+          height={256}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
         <h1 className="font-heading text-5xl md:text-7xl font-bold mb-4">
           <span className="text-foreground">Ô Batroun</span>{" "}
           <span className="text-primary italic">Guesthouse</span>

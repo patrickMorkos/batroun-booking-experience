@@ -2,6 +2,7 @@ import { Phone, MapPin } from "lucide-react";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { SLOT_MAP } from "@/lib/siteImageSlots";
 import { WA_LINK_1 } from "@/lib/utils";
+import logo from "@/assets/logo.jpeg";
 
 export default function Contact() {
   const { data: images } = useSiteImages();
@@ -20,7 +21,7 @@ export default function Contact() {
 
         <div className="max-w-2xl mx-auto bg-card rounded-2xl border border-border p-8 md:p-12">
           <div className="flex justify-center mb-8">
-            <img src={images?.logo.url ?? SLOT_MAP.logo.fallback} alt={images?.logo.alt ?? SLOT_MAP.logo.defaultAlt} className="w-20 h-20 rounded-full" />
+            <img src={logo} alt="Ô Batroun Guesthouse" className="w-20 h-20 rounded-full" />
           </div>
 
           <div className="space-y-6">
