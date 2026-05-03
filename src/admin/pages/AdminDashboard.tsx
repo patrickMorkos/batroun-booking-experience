@@ -47,7 +47,7 @@ export default function AdminDashboard() {
 
   const SOCIAL_COLORS: Record<string, string> = {
     instagram: "#E1306C",
-    tiktok: "#010101",
+    tiktok: "#69C9D0",
     facebook: "#1877F2",
   };
 
@@ -171,6 +171,9 @@ export default function AdminDashboard() {
                       cy="50%"
                       outerRadius={90}
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      labelLine={{ stroke: "hsl(220 10% 55%)" }}
+                      fontSize={13}
+                      fill="hsl(40 20% 90%)"
                     >
                       {socialChartData.map((entry, index) => (
                         <Cell key={index} fill={entry.color} />
