@@ -214,6 +214,7 @@ export interface Database {
           available: boolean;
           note: string | null;
           display_order: number;
+          media_urls: string[] | null;
           created_at: string;
         };
         Insert: {
@@ -223,6 +224,7 @@ export interface Database {
           available?: boolean;
           note?: string | null;
           display_order?: number;
+          media_urls?: string[] | null;
           created_at?: string;
         };
         Update: {
@@ -231,6 +233,7 @@ export interface Database {
           available?: boolean;
           note?: string | null;
           display_order?: number;
+          media_urls?: string[] | null;
         };
       };
       amenities: {
@@ -286,7 +289,7 @@ export type ChaletWithImages = Chalet & {
 export type SiteImage = Database["public"]["Tables"]["site_images"]["Row"];
 export type SiteImageInsert = Database["public"]["Tables"]["site_images"]["Insert"];
 export type SiteImageUpdate = Database["public"]["Tables"]["site_images"]["Update"];
-export type SiteImageSlot = "hero_bg" | "logo" | "amenity_pool" | "amenity_lobby" | "nearby";
+export type SiteImageSlot = "hero_bg" | "logo" | "nearby";
 
 export type GalleryMedia = Database["public"]["Tables"]["gallery_media"]["Row"];
 export type GalleryMediaInsert = Database["public"]["Tables"]["gallery_media"]["Insert"];

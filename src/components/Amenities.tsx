@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAmenities } from "@/hooks/useAmenities";
-import { useSiteImages } from "@/hooks/useSiteImages";
 import { useGalleryMedia } from "@/hooks/useGalleryMedia";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
-import { SLOT_MAP } from "@/lib/siteImageSlots";
 import OptimizedImage from "@/components/OptimizedImage";
 import LazyVideo from "@/components/LazyVideo";
 import {
@@ -19,7 +17,6 @@ import type { Amenity } from "@/types/database";
 
 export default function Amenities() {
   const { data: amenities } = useAmenities();
-  const { data: siteImages } = useSiteImages();
   const { data: galleryMedia } = useGalleryMedia();
   const [api, setApi] = useState<CarouselApi>();
   const [fullApi, setFullApi] = useState<CarouselApi>();
@@ -67,17 +64,6 @@ export default function Amenities() {
     () => setIsFullscreenOpen(false)
   );
 
-  const fallbackImages = [
-    {
-      src: siteImages?.amenity_pool.url ?? SLOT_MAP.amenity_pool.fallback,
-      alt: siteImages?.amenity_pool.alt ?? SLOT_MAP.amenity_pool.defaultAlt,
-    },
-    {
-      src: siteImages?.amenity_lobby.url ?? SLOT_MAP.amenity_lobby.fallback,
-      alt: siteImages?.amenity_lobby.alt ?? SLOT_MAP.amenity_lobby.defaultAlt,
-    },
-  ];
-
   const hasGallery = galleryMedia && galleryMedia.length > 0;
 
   return (
@@ -106,7 +92,7 @@ export default function Amenities() {
           ))}
         </div>
 
-        {hasGallery ? (
+        {hasGallery && (
           <div className="mx-auto max-w-4xl">
             <Carousel
               setApi={setApi}
@@ -197,22 +183,6 @@ export default function Amenities() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {fallbackImages.map((img, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden group">
-                <OptimizedImage
-                  src={img.src}
-                  alt={img.alt}
-                  width={800}
-                  height={600}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="group-hover:scale-105 transition-transform duration-500"
-                  containerClassName="w-full h-64 md:h-80"
-                />
-              </div>
-            ))}
           </div>
         )}
       </div>

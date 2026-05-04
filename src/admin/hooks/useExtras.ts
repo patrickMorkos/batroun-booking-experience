@@ -57,3 +57,23 @@ export function useDeleteExtra() {
     },
   });
 }
+
+export function useUploadExtraMedia() {
+  return useMutation({
+    mutationFn: async (file: File): Promise<string> => {
+      const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const fileName = `extras/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("site-images")
+        .upload(fileName, file, { contentType: file.type, upsert: false });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("site-images")
+        .getPublicUrl(fileName);
+
+      return urlData.publicUrl;
+    },
+  });
+}

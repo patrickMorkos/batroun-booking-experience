@@ -24,20 +24,6 @@ export const SITE_IMAGE_SLOTS: SlotConfig[] = [
     description: "Circular logo used in the navbar, hero, contact, and footer (recommended: 256×256, PNG)",
   },
   {
-    slot: "amenity_pool",
-    label: "Amenity — Pool",
-    fallback: "",
-    defaultAlt: "Pool amenity",
-    description: "Left image in the amenities showcase grid (recommended: 800×600, JPEG)",
-  },
-  {
-    slot: "amenity_lobby",
-    label: "Amenity — Lobby",
-    fallback: "",
-    defaultAlt: "Lobby amenity",
-    description: "Right image in the amenities showcase grid (recommended: 800×600, JPEG)",
-  },
-  {
     slot: "nearby",
     label: "Nearby Attractions",
     fallback: "",

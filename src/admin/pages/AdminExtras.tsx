@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useAdminExtras, useCreateExtra, useUpdateExtra, useDeleteExtra } from "@/admin/hooks/useExtras";
+import { useRef, useState } from "react";
+import { useAdminExtras, useCreateExtra, useUpdateExtra, useDeleteExtra, useUploadExtraMedia } from "@/admin/hooks/useExtras";
 import AdminHeader from "@/admin/components/AdminHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Extra } from "@/types/database";
 
@@ -20,19 +20,22 @@ interface FormState {
   available: boolean;
   note: string;
   display_order: string;
+  media_urls: string[];
 }
 
-const emptyForm: FormState = { name: "", price: "5", available: true, note: "", display_order: "0" };
+const emptyForm: FormState = { name: "", price: "5", available: true, note: "", display_order: "0", media_urls: [] };
 
 export default function AdminExtras() {
   const { data: extras, isLoading, isError } = useAdminExtras();
   const createExtra = useCreateExtra();
   const updateExtra = useUpdateExtra();
   const deleteExtra = useDeleteExtra();
+  const uploadMedia = useUploadExtraMedia();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingExtra, setEditingExtra] = useState<Extra | undefined>();
   const [form, setForm] = useState<FormState>(emptyForm);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const openCreate = () => {
     setEditingExtra(undefined);
@@ -48,18 +51,39 @@ export default function AdminExtras() {
       available: extra.available,
       note: extra.note || "",
       display_order: String(extra.display_order),
+      media_urls: extra.media_urls || [],
     });
     setFormOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    uploadMedia.mutate(file, {
+      onSuccess: (url) => {
+        setForm((f) => ({ ...f, media_urls: [...f.media_urls, url] }));
+        toast.success("File uploaded");
+      },
+      onError: (err) => toast.error(err.message),
+    });
+
+    e.target.value = "";
+  };
+
+  const removeMedia = (index: number) => {
+    setForm((f) => ({ ...f, media_urls: f.media_urls.filter((_, i) => i !== index) }));
   };
 
   const handleSave = () => {
     if (!form.name.trim()) { toast.error("Name is required"); return; }
     const price = parseFloat(form.price) || 0;
     const display_order = parseInt(form.display_order) || 0;
+    const media_urls = form.media_urls.length > 0 ? form.media_urls : null;
 
     if (editingExtra) {
       updateExtra.mutate(
-        { id: editingExtra.id, updates: { name: form.name, price, available: form.available, note: form.note || null, display_order } },
+        { id: editingExtra.id, updates: { name: form.name, price, available: form.available, note: form.note || null, display_order, media_urls } },
         {
           onSuccess: () => { setFormOpen(false); toast.success("Extra updated"); },
           onError: (e) => toast.error(e.message),
@@ -67,7 +91,7 @@ export default function AdminExtras() {
       );
     } else {
       createExtra.mutate(
-        { name: form.name, price, available: form.available, note: form.note || null, display_order },
+        { name: form.name, price, available: form.available, note: form.note || null, display_order, media_urls },
         {
           onSuccess: () => { setFormOpen(false); toast.success("Extra created"); },
           onError: (e) => toast.error(e.message),
@@ -102,6 +126,7 @@ export default function AdminExtras() {
                 <TableHead>Name</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="hidden sm:table-cell">Media</TableHead>
                 <TableHead className="hidden sm:table-cell">Note</TableHead>
                 <TableHead className="hidden sm:table-cell">Order</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -114,6 +139,7 @@ export default function AdminExtras() {
                       <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-12" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-12" /></TableCell>
                       <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
                       <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-8" /></TableCell>
                       <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
@@ -127,6 +153,9 @@ export default function AdminExtras() {
                         <Badge variant={extra.available ? "default" : "secondary"}>
                           {extra.available ? "Available" : "Unavailable"}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
+                        {extra.media_urls?.length ? `${extra.media_urls.length} file(s)` : "—"}
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">{extra.note || "—"}</TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground">{extra.display_order}</TableCell>
@@ -171,7 +200,7 @@ export default function AdminExtras() {
       </div>
 
       <Dialog open={formOpen} onOpenChange={(v) => !v && setFormOpen(false)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingExtra ? "Edit Extra" : "Add Extra"}</DialogTitle>
           </DialogHeader>
@@ -195,6 +224,42 @@ export default function AdminExtras() {
             <div>
               <Label>Display Order</Label>
               <Input type="number" min="0" value={form.display_order} onChange={(e) => setForm({ ...form, display_order: e.target.value })} />
+            </div>
+            <div>
+              <Label>Menu / Media Files</Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              {form.media_urls.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  {form.media_urls.map((url, i) => (
+                    <div key={i} className="relative group">
+                      <img src={url} alt={`Media ${i + 1}`} className="h-20 w-full object-cover rounded-lg" />
+                      <button
+                        type="button"
+                        onClick={() => removeMedia(i)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full mt-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadMedia.isPending}
+              >
+                {uploadMedia.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Uploading...</> : <><Upload className="h-4 w-4 mr-2" />Upload Image</>}
+              </Button>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
