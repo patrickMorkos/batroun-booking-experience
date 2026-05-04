@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { sharedAmenities } from "@/data/chalets";
+import { useAmenities } from "@/hooks/useAmenities";
 import { useSiteImages } from "@/hooks/useSiteImages";
 import { useGalleryMedia } from "@/hooks/useGalleryMedia";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
@@ -15,14 +15,17 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import type { Amenity } from "@/types/database";
 
 export default function Amenities() {
+  const { data: amenities } = useAmenities();
   const { data: siteImages } = useSiteImages();
   const { data: galleryMedia } = useGalleryMedia();
   const [api, setApi] = useState<CarouselApi>();
   const [fullApi, setFullApi] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
+  const [selectedAmenity, setSelectedAmenity] = useState<Amenity | null>(null);
 
   useEffect(() => {
     if (!api) return;
@@ -90,14 +93,16 @@ export default function Amenities() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
-          {sharedAmenities.map((a) => (
-            <div
-              key={a.name}
-              className="bg-card rounded-2xl p-6 text-center hover:border-primary border border-border transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10"
+          {amenities?.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => setSelectedAmenity(a)}
+              className="bg-card rounded-2xl p-6 text-center hover:border-primary border border-border transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 cursor-pointer"
             >
               <div className="text-4xl mb-3">{a.icon}</div>
               <p className="text-sm font-medium text-foreground">{a.name}</p>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -211,6 +216,29 @@ export default function Amenities() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!selectedAmenity} onOpenChange={(v) => !v && setSelectedAmenity(null)}>
+        <DialogContent className="sm:max-w-sm max-w-[90vw] rounded-2xl p-0 overflow-hidden">
+          {selectedAmenity?.image_url ? (
+            <div>
+              <img
+                src={selectedAmenity.image_url}
+                alt={selectedAmenity.name}
+                className="w-full aspect-[9/16] object-cover"
+              />
+              <div className="p-4 text-center">
+                <p className="font-heading text-lg font-semibold">{selectedAmenity.name}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center aspect-[9/16] px-6">
+              <span className="text-7xl mb-4">{selectedAmenity?.icon}</span>
+              <p className="font-heading text-xl font-semibold">{selectedAmenity?.name}</p>
+              <p className="text-sm text-muted-foreground mt-1">Photo coming soon</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

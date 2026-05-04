@@ -233,6 +233,30 @@ export interface Database {
           display_order?: number;
         };
       };
+      amenities: {
+        Row: {
+          id: string;
+          name: string;
+          icon: string;
+          image_url: string | null;
+          display_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          icon: string;
+          image_url?: string | null;
+          display_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          icon?: string;
+          image_url?: string | null;
+          display_order?: number;
+        };
+      };
     };
     Functions: {
       get_daily_page_views: {
@@ -271,3 +295,7 @@ export type GalleryMediaUpdate = Database["public"]["Tables"]["gallery_media"]["
 export type Extra = Database["public"]["Tables"]["extras"]["Row"];
 export type ExtraInsert = Database["public"]["Tables"]["extras"]["Insert"];
 export type ExtraUpdate = Database["public"]["Tables"]["extras"]["Update"];
+
+export type Amenity = Database["public"]["Tables"]["amenities"]["Row"];
+export type AmenityInsert = Database["public"]["Tables"]["amenities"]["Insert"];
+export type AmenityUpdate = Database["public"]["Tables"]["amenities"]["Update"];

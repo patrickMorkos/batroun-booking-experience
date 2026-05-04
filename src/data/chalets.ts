@@ -1,14 +1,5 @@
 export const includedAmenities = ["Soap", "Shampoo", "Shower gel", "Towels"];
 
-export const sharedAmenities = [
-  { name: "Shared Pool", icon: "🏊" },
-  { name: "Private Pool", icon: "🏖️" },
-  { name: "Gym", icon: "💪" },
-  { name: "Lobby with Billiards & Games", icon: "🎱" },
-  { name: "Restaurant", icon: "🍽️" },
-  { name: "Big Garden", icon: "🌿" },
-];
-
 export const nearbyPlaces = [
   { name: "Batroun Souks", description: "Traditional markets just 5 minutes away", icon: "🛍️" },
   { name: "Beaches & Beach Clubs", description: "Crystal-clear Mediterranean waters", icon: "🏖️" },

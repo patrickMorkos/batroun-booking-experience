@@ -21,12 +21,18 @@ const AdminUsers = lazy(() => import("@/admin/pages/AdminUsers"));
 const AdminSiteImages = lazy(() => import("@/admin/pages/AdminSiteImages"));
 const AdminGallery = lazy(() => import("@/admin/pages/AdminGallery"));
 const AdminExtras = lazy(() => import("@/admin/pages/AdminExtras"));
+const AdminAmenities = lazy(() => import("@/admin/pages/AdminAmenities"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnMount: "always",
       refetchOnWindowFocus: false,
+      networkMode: "always",
+      retry: 1,
+    },
+    mutations: {
+      networkMode: "always",
     },
   },
 });
@@ -59,6 +65,7 @@ function AppShell() {
           <Route path="/admin/site-images" element={<Suspense fallback={<AdminFallback />}><AdminSiteImages /></Suspense>} />
           <Route path="/admin/gallery" element={<Suspense fallback={<AdminFallback />}><AdminGallery /></Suspense>} />
           <Route path="/admin/extras" element={<Suspense fallback={<AdminFallback />}><AdminExtras /></Suspense>} />
+          <Route path="/admin/amenities" element={<Suspense fallback={<AdminFallback />}><AdminAmenities /></Suspense>} />
         </Route>
       </Route>
 
