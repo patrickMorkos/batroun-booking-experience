@@ -28,7 +28,10 @@ export function usePublicChalet(slug: string | undefined) {
         .eq("slug", slug!)
         .eq("is_active", true)
         .single();
-      if (error) throw error;
+      if (error) {
+        if (error.code === "PGRST116") return null;
+        throw error;
+      }
       return data as ChaletWithImages;
     },
     enabled: !!slug,

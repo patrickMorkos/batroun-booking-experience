@@ -54,7 +54,13 @@ export default function AdminUsers() {
 
   return (
     <div className="flex flex-col">
-      <AdminHeader title="Admin Users" />
+      <AdminHeader title="Admin Users">
+        {isSuperAdmin && (
+          <Button onClick={() => setFormOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Add User
+          </Button>
+        )}
+      </AdminHeader>
 
       <div className="p-6">
         <div className="rounded-lg border border-border/50 bg-card">

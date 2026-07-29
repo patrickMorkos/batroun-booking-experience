@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { uploadFile, deleteFile } from "@/lib/storage";
 import type { SiteImage, SiteImageSlot } from "@/types/database";
 
 export function useAdminSiteImages() {
@@ -27,17 +28,14 @@ export function useSiteImageUpload() {
       const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const fileName = `${slot}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("site-images")
-        .upload(fileName, file, { contentType: file.type, upsert: false });
-      if (uploadError) throw uploadError;
+      await uploadFile("site-images", fileName, file, file.type);
 
       const { data: urlData } = supabase.storage
         .from("site-images")
         .getPublicUrl(fileName);
 
       if (existing.data) {
-        await supabase.storage.from("site-images").remove([existing.data.storage_path]);
+        await deleteFile("site-images", existing.data.storage_path);
 
         const { data, error } = await supabase
           .from("site_images")
@@ -79,7 +77,7 @@ export function useSiteImageDelete() {
 
   return useMutation({
     mutationFn: async ({ id, storagePath }: { id: string; storagePath: string }) => {
-      await supabase.storage.from("site-images").remove([storagePath]);
+      await deleteFile("site-images", storagePath);
       const { error } = await supabase.from("site_images").delete().eq("id", id);
       if (error) throw error;
     },

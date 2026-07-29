@@ -30,6 +30,24 @@ vi.stubGlobal("sessionStorage", {
 vi.stubEnv("VITE_SUPABASE_URL", "https://test.supabase.co");
 vi.stubEnv("VITE_SUPABASE_ANON_KEY", "test-anon-key");
 
+vi.stubGlobal("createImageBitmap", vi.fn().mockResolvedValue({ width: 800, height: 600, close: () => {} }));
+
+class MockOffscreenCanvas {
+  width: number;
+  height: number;
+  constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
+  getContext() {
+    return { drawImage: () => {} };
+  }
+  convertToBlob() {
+    return Promise.resolve(new Blob());
+  }
+}
+vi.stubGlobal("OffscreenCanvas", MockOffscreenCanvas);
+
 if (typeof URL.createObjectURL === "undefined") {
   URL.createObjectURL = vi.fn(() => "blob:http://localhost/fake-blob-url");
 }

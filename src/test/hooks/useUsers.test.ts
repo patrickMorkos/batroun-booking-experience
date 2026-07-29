@@ -18,7 +18,7 @@ describe("useAdminUsers", () => {
       select: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: profiles, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useAdminUsers());
 
@@ -35,8 +35,8 @@ describe("useCreateUser", () => {
     vi.clearAllMocks();
   });
 
-  it("invokes edge function with user data", async () => {
-    mockSupabase.functions.invoke.mockResolvedValue({ data: { user: { id: "new-user" } }, error: null });
+  it("calls create_admin_user RPC with user data", async () => {
+    mockSupabase.rpc.mockResolvedValue({ data: "new-user-id", error: null });
 
     const { result } = renderHookWithProviders(() => useCreateUser());
 
@@ -52,13 +52,14 @@ describe("useCreateUser", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(mockSupabase.functions.invoke).toHaveBeenCalledWith("create-admin-user", {
-      body: expect.objectContaining({ email: "new@test.com", role: "admin" }),
-    });
+    expect(mockSupabase.rpc).toHaveBeenCalledWith(
+      "create_admin_user",
+      expect.objectContaining({ p_email: "new@test.com", p_role: "admin" })
+    );
   });
 
-  it("throws when edge function returns error in data", async () => {
-    mockSupabase.functions.invoke.mockResolvedValue({ data: { error: "Email taken" }, error: null });
+  it("throws when the RPC returns an error", async () => {
+    mockSupabase.rpc.mockResolvedValue({ data: null, error: { message: "Email taken" } });
 
     const { result } = renderHookWithProviders(() => useCreateUser());
 
@@ -87,7 +88,7 @@ describe("useUpdateUser", () => {
       update: vi.fn().mockReturnThis(),
       eq: vi.fn().mockResolvedValue({ error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useUpdateUser());
 
@@ -105,8 +106,8 @@ describe("useDeleteUser", () => {
     vi.clearAllMocks();
   });
 
-  it("invokes delete edge function", async () => {
-    mockSupabase.functions.invoke.mockResolvedValue({ data: {}, error: null });
+  it("calls delete_admin_user RPC", async () => {
+    mockSupabase.rpc.mockResolvedValue({ data: null, error: null });
 
     const { result } = renderHookWithProviders(() => useDeleteUser());
 
@@ -115,8 +116,6 @@ describe("useDeleteUser", () => {
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockSupabase.functions.invoke).toHaveBeenCalledWith("delete-admin-user", {
-      body: { user_id: "user-1" },
-    });
+    expect(mockSupabase.rpc).toHaveBeenCalledWith("delete_admin_user", { p_id: "user-1" });
   });
 });

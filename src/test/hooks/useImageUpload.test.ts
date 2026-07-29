@@ -5,6 +5,13 @@ import { buildChaletImage } from "@/test/mocks/factories";
 import { renderHookWithProviders } from "@/test/utils/render";
 
 import "@/test/mocks/supabase";
+
+vi.mock("@/lib/storage", () => ({
+  uploadFile: vi.fn(),
+  deleteFile: vi.fn(),
+}));
+
+import { uploadFile, deleteFile } from "@/lib/storage";
 import { useImageUpload } from "@/admin/hooks/useImageUpload";
 
 describe("useImageUpload", () => {
@@ -13,13 +20,8 @@ describe("useImageUpload", () => {
   });
 
   describe("upload", () => {
-    it("uploads file to storage, gets public URL, and inserts DB record", async () => {
-      const mockStorageBucket = {
-        upload: vi.fn().mockResolvedValue({ data: { path: "chalet-1/123.jpg" }, error: null }),
-        getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: "https://test.supabase.co/public/chalet-1/123.jpg" } }),
-        remove: vi.fn(),
-      };
-      mockSupabase.storage.from.mockReturnValue(mockStorageBucket as any);
+    it("uploads file to storage and inserts DB record", async () => {
+      vi.mocked(uploadFile).mockResolvedValue(undefined);
 
       const insertedImage = buildChaletImage({ chalet_id: "chalet-1" });
       const chain = {
@@ -27,7 +29,7 @@ describe("useImageUpload", () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: insertedImage, error: null }),
       };
-      mockSupabase.from.mockImplementation(() => chain as any);
+      mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
       const { result } = renderHookWithProviders(() => useImageUpload());
 
@@ -39,11 +41,11 @@ describe("useImageUpload", () => {
 
       await waitFor(() => expect(result.current.upload.isSuccess).toBe(true));
 
-      expect(mockSupabase.storage.from).toHaveBeenCalledWith("chalet-images");
-      expect(mockStorageBucket.upload).toHaveBeenCalledWith(
+      expect(uploadFile).toHaveBeenCalledWith(
+        "chalet-images",
         expect.stringContaining("chalet-1/"),
-        file,
-        expect.objectContaining({ contentType: "image/jpeg" })
+        expect.anything(),
+        expect.any(String)
       );
       expect(chain.insert).toHaveBeenCalledWith(expect.objectContaining({
         chalet_id: "chalet-1",
@@ -53,12 +55,7 @@ describe("useImageUpload", () => {
     });
 
     it("throws when storage upload fails", async () => {
-      const mockStorageBucket = {
-        upload: vi.fn().mockResolvedValue({ data: null, error: { message: "Upload failed" } }),
-        getPublicUrl: vi.fn(),
-        remove: vi.fn(),
-      };
-      mockSupabase.storage.from.mockReturnValue(mockStorageBucket as any);
+      vi.mocked(uploadFile).mockRejectedValue(new Error("Upload failed"));
 
       const { result } = renderHookWithProviders(() => useImageUpload());
       const file = new File(["test"], "photo.jpg", { type: "image/jpeg" });
@@ -68,24 +65,19 @@ describe("useImageUpload", () => {
       });
 
       await waitFor(() => expect(result.current.upload.isError).toBe(true));
-      expect(result.current.upload.error).toEqual({ message: "Upload failed" });
+      expect(result.current.upload.error).toEqual(new Error("Upload failed"));
     });
   });
 
   describe("deleteImage", () => {
     it("removes from storage and deletes DB record", async () => {
-      const mockStorageBucket = {
-        upload: vi.fn(),
-        getPublicUrl: vi.fn(),
-        remove: vi.fn().mockResolvedValue({ data: [], error: null }),
-      };
-      mockSupabase.storage.from.mockReturnValue(mockStorageBucket as any);
+      vi.mocked(deleteFile).mockResolvedValue(undefined);
 
       const chain = {
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
       };
-      mockSupabase.from.mockImplementation(() => chain as any);
+      mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
       const { result } = renderHookWithProviders(() => useImageUpload());
 
@@ -95,7 +87,7 @@ describe("useImageUpload", () => {
 
       await waitFor(() => expect(result.current.deleteImage.isSuccess).toBe(true));
 
-      expect(mockStorageBucket.remove).toHaveBeenCalledWith(["chalet-1/img.jpg"]);
+      expect(deleteFile).toHaveBeenCalledWith("chalet-images", "chalet-1/img.jpg");
       expect(chain.eq).toHaveBeenCalledWith("id", "img-1");
     });
   });
@@ -106,7 +98,7 @@ describe("useImageUpload", () => {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
       };
-      mockSupabase.from.mockImplementation(() => chain as any);
+      mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
       const { result } = renderHookWithProviders(() => useImageUpload());
 

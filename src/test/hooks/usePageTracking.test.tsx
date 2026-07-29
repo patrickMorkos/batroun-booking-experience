@@ -20,7 +20,7 @@ describe("usePageTracking", () => {
     const chain = {
       insert: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
   });
 
   it("inserts page view for public routes", () => {
@@ -39,7 +39,7 @@ describe("usePageTracking", () => {
     const chain = {
       insert: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderHook(() => usePageTracking(), { wrapper: createWrapper("/chalets/beach-house") });
 
@@ -53,7 +53,7 @@ describe("usePageTracking", () => {
     const chain = {
       insert: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderHook(() => usePageTracking(), { wrapper: createWrapper("/contact") });
 
@@ -67,7 +67,7 @@ describe("usePageTracking", () => {
     const chain = {
       insert: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderHook(() => usePageTracking(), { wrapper: createWrapper("/") });
 

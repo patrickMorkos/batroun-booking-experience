@@ -15,7 +15,7 @@ import { useAuth } from "@/admin/hooks/useAuth";
 
 const mockedUseAuth = vi.mocked(useAuth);
 
-function renderProtected(authState: any) {
+function renderProtected(authState: ReturnType<typeof useAuth>) {
   mockedUseAuth.mockReturnValue(authState);
 
   return render(

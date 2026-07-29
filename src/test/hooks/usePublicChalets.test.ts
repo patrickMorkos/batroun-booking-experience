@@ -19,7 +19,7 @@ describe("usePublicChalets", () => {
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: chalets, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => usePublicChalets());
 
@@ -37,7 +37,7 @@ describe("usePublicChalets", () => {
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: null, error: { message: "Network error" } }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => usePublicChalets());
 
@@ -57,7 +57,7 @@ describe("usePublicChalet", () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: chalet, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => usePublicChalet("beach-house"));
 

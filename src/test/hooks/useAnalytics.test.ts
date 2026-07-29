@@ -17,7 +17,7 @@ describe("useTotalPageViews", () => {
       gte: vi.fn().mockReturnThis(),
       lte: vi.fn().mockResolvedValue({ count: 42, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useTotalPageViews("2024-01-01", "2024-01-31"));
 
@@ -40,7 +40,7 @@ describe("useUniqueVisitors", () => {
         error: null,
       }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useUniqueVisitors("2024-01-01", "2024-01-31"));
 
@@ -111,7 +111,7 @@ describe("useTopPages", () => {
         error: null,
       }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useTopPages("2024-01-01", "2024-01-31"));
 

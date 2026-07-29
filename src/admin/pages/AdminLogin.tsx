@@ -33,7 +33,7 @@ export default function AdminLogin() {
     try {
       await signIn(data.email, data.password);
       navigate("/admin");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Invalid credentials");
     } finally {
       setIsSubmitting(false);

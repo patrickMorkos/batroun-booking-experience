@@ -18,7 +18,7 @@ describe("ChaletsList", () => {
       eq: vi.fn().mockReturnThis(),
       order: vi.fn(() => new Promise(() => {})), // never resolves
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { container } = renderWithProviders(<ChaletsList />);
 
@@ -32,7 +32,7 @@ describe("ChaletsList", () => {
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: [], error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderWithProviders(<ChaletsList />);
 
@@ -51,7 +51,7 @@ describe("ChaletsList", () => {
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: chalets, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderWithProviders(<ChaletsList />);
 

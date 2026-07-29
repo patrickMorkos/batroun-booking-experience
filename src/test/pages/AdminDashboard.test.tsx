@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { ReactNode } from "react";
 import { screen, waitFor } from "@testing-library/react";
 import { mockSupabase } from "@/test/mocks/supabase";
 import { renderWithProviders } from "@/test/utils/render";
@@ -21,10 +22,10 @@ import AdminDashboard from "@/admin/pages/AdminDashboard";
 
 // Mock recharts to avoid ResizeObserver issues in jsdom
 vi.mock("recharts", () => ({
-  ResponsiveContainer: ({ children }: any) => <div data-testid="chart-container">{children}</div>,
-  LineChart: ({ children }: any) => <div data-testid="line-chart">{children}</div>,
+  ResponsiveContainer: ({ children }: { children: ReactNode }) => <div data-testid="chart-container">{children}</div>,
+  LineChart: ({ children }: { children: ReactNode }) => <div data-testid="line-chart">{children}</div>,
   Line: () => null,
-  BarChart: ({ children }: any) => <div data-testid="bar-chart">{children}</div>,
+  BarChart: ({ children }: { children: ReactNode }) => <div data-testid="bar-chart">{children}</div>,
   Bar: () => null,
   XAxis: () => null,
   YAxis: () => null,
@@ -44,7 +45,7 @@ describe("AdminDashboard", () => {
       gte: vi.fn().mockReturnThis(),
       lte: vi.fn().mockResolvedValue({ count: 100, data: [{ session_id: "a" }, { session_id: "b" }], error: null }),
     };
-    mockSupabase.from.mockImplementation(() => countChain as any);
+    mockSupabase.from.mockImplementation(() => countChain as unknown as ReturnType<typeof mockSupabase.from>);
     mockSupabase.rpc.mockResolvedValue({ data: [{ day: "2024-01-01", count: 10 }], error: null });
 
     renderWithProviders(<AdminDashboard />, { withSidebar: true });
@@ -66,7 +67,7 @@ describe("AdminDashboard", () => {
       gte: vi.fn().mockReturnThis(),
       lte: vi.fn().mockResolvedValue({ count: 0, data: [], error: null }),
     };
-    mockSupabase.from.mockImplementation(() => countChain as any);
+    mockSupabase.from.mockImplementation(() => countChain as unknown as ReturnType<typeof mockSupabase.from>);
     mockSupabase.rpc.mockResolvedValue({ data: [], error: null });
 
     renderWithProviders(<AdminDashboard />, { withSidebar: true });

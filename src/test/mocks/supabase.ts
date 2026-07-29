@@ -1,7 +1,9 @@
 import { vi } from "vitest";
 
+export type SupabaseChainMock = Record<string, ReturnType<typeof vi.fn>> & { then?: undefined };
+
 function createChainMock() {
-  const chain: Record<string, ReturnType<typeof vi.fn>> = {};
+  const chain: SupabaseChainMock = {};
 
   const methods = ["select", "insert", "update", "delete", "eq", "neq", "gte", "lte", "order", "single", "limit", "maybeSingle"];
 
@@ -14,7 +16,7 @@ function createChainMock() {
   chain.select = vi.fn(() => chain);
 
   // Make the chain thenable so `await supabase.from(...).insert(...)` works
-  (chain as any).then = undefined;
+  chain.then = undefined;
 
   return chain;
 }
@@ -32,7 +34,7 @@ export function resetChains() {
   Object.keys(chainInstances).forEach((key) => delete chainInstances[key]);
 }
 
-const authCallbacks: Array<(event: string, session: any) => void> = [];
+const authCallbacks: Array<(event: string, session: unknown) => void> = [];
 
 export const mockSupabase = {
   from: vi.fn((table: string) => getChainFor(table)),
@@ -59,10 +61,13 @@ export const mockSupabase = {
   },
 };
 
-export function triggerAuthEvent(event: string, session: any) {
+export function triggerAuthEvent(event: string, session: unknown) {
   authCallbacks.forEach((cb) => cb(event, session));
 }
 
+export const ADMIN_TOKEN_KEY = "obatroun_admin_token";
+
 vi.mock("@/lib/supabase", () => ({
   supabase: mockSupabase,
+  ADMIN_TOKEN_KEY: "obatroun_admin_token",
 }));

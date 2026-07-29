@@ -33,7 +33,7 @@ export default function AdminForgotPassword() {
       await resetPassword(data.email);
       setSent(true);
       toast.success("Password reset email sent!");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to send reset email");
     } finally {
       setIsSubmitting(false);

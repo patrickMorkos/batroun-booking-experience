@@ -29,14 +29,15 @@ export function useCreateUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: CreateUserData) => {
-      const { data: result, error } = await supabase.functions.invoke("create-admin-user", {
-        body: data,
+      const { data: result, error } = await supabase.rpc("create_admin_user", {
+        p_email: data.email,
+        p_password: data.password,
+        p_first_name: data.first_name,
+        p_last_name: data.last_name,
+        p_phone: data.phone ?? null,
+        p_role: data.role,
       });
-      if (error) {
-        const msg = result?.error || error.message || "Failed to create user";
-        throw new Error(msg);
-      }
-      if (result?.error) throw new Error(result.error);
+      if (error) throw new Error(error.message || "Failed to create user");
       return result;
     },
     onSuccess: () => {
@@ -65,11 +66,8 @@ export function useDeleteUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke("delete-admin-user", {
-        body: { user_id: id },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      const { error } = await supabase.rpc("delete_admin_user", { p_id: id });
+      if (error) throw new Error(error.message || "Failed to delete user");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });

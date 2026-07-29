@@ -42,7 +42,7 @@ export default function AdminChaletEdit() {
         await updateChalet.mutateAsync({ id: id!, updates: payload });
         toast.success("Chalet updated!");
       }
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e.message);
     }
   };

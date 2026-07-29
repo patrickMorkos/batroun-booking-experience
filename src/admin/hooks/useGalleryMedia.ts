@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { uploadFile, deleteFile } from "@/lib/storage";
 import { compressImage } from "@/lib/imageCompressor";
 import type { GalleryMedia } from "@/types/database";
 
@@ -14,32 +15,6 @@ export function useAdminGalleryMedia() {
       if (error) throw error;
       return data as GalleryMedia[];
     },
-  });
-}
-
-function uploadWithProgress(
-  url: string,
-  file: File,
-  token: string,
-  onProgress?: (pct: number) => void,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", url);
-    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.setRequestHeader("x-upsert", "false");
-    xhr.upload.addEventListener("progress", (e) => {
-      if (e.lengthComputable && onProgress) {
-        onProgress(Math.round((e.loaded / e.total) * 100));
-      }
-    });
-    xhr.addEventListener("load", () => {
-      if (xhr.status >= 200 && xhr.status < 300) resolve();
-      else reject(new Error(xhr.responseText || `Upload failed (${xhr.status})`));
-    });
-    xhr.addEventListener("error", () => reject(new Error("Network error during upload")));
-    xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
-    xhr.send(file);
   });
 }
 
@@ -59,14 +34,7 @@ export function useGalleryMediaUpload() {
       const fileName = `gallery/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
       const type = isVideo ? "video" : "image";
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-      if (!token) throw new Error("Not authenticated");
-
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const uploadUrl = `${supabaseUrl}/storage/v1/object/gallery-media/${fileName}`;
-
-      await uploadWithProgress(uploadUrl, processedFile, token, onProgress);
+      await uploadFile("gallery-media", fileName, processedFile, processedFile.type, onProgress);
 
       const { data: urlData } = supabase.storage
         .from("gallery-media")
@@ -107,7 +75,7 @@ export function useGalleryMediaDelete() {
 
   return useMutation({
     mutationFn: async ({ id, storagePath }: { id: string; storagePath: string }) => {
-      await supabase.storage.from("gallery-media").remove([storagePath]);
+      await deleteFile("gallery-media", storagePath);
       const { error } = await supabase.from("gallery_media").delete().eq("id", id);
       if (error) throw error;
     },

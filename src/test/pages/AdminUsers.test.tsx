@@ -34,7 +34,7 @@ describe("AdminUsers", () => {
       select: vi.fn().mockReturnValue({
         order: vi.fn().mockResolvedValue({ data: users, error: null }),
       }),
-    }) as any);
+    }) as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderWithProviders(<AdminUsers />, { withSidebar: true });
 
@@ -48,7 +48,7 @@ describe("AdminUsers", () => {
       select: vi.fn().mockReturnThis(),
       order: vi.fn(() => new Promise(() => {})),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { container } = renderWithProviders(<AdminUsers />, { withSidebar: true });
 
@@ -61,7 +61,7 @@ describe("AdminUsers", () => {
       select: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: [], error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderWithProviders(<AdminUsers />, { withSidebar: true });
 

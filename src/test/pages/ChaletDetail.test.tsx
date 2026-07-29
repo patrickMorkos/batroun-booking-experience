@@ -33,7 +33,7 @@ describe("ChaletDetail", () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn(() => new Promise(() => {})),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { container } = renderChaletDetail("beach-house");
 
@@ -58,7 +58,7 @@ describe("ChaletDetail", () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: chalet, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderChaletDetail("beach-house");
 
@@ -73,7 +73,7 @@ describe("ChaletDetail", () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: null, error: { message: "Not found", code: "PGRST116" } }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     renderChaletDetail("nonexistent");
 

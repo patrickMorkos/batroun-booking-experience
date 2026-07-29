@@ -6,6 +6,7 @@ import { renderHookWithProviders } from "@/test/utils/render";
 
 import "@/test/mocks/supabase";
 import { useAdminChalets, useAdminChalet, useCreateChalet, useUpdateChalet, useDeleteChalet, useToggleChaletActive } from "@/admin/hooks/useChalets";
+import type { ChaletInsert } from "@/types/database";
 
 describe("useAdminChalets", () => {
   beforeEach(() => {
@@ -18,7 +19,7 @@ describe("useAdminChalets", () => {
       select: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: chalets, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useAdminChalets());
 
@@ -34,7 +35,7 @@ describe("useAdminChalets", () => {
       select: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({ data: null, error: { message: "Fetch failed" } }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useAdminChalets());
 
@@ -55,7 +56,7 @@ describe("useAdminChalet", () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: chalet, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useAdminChalet("chalet-1"));
 
@@ -86,12 +87,12 @@ describe("useCreateChalet", () => {
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: { id: "new-1", ...newChalet }, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useCreateChalet());
 
     await act(async () => {
-      result.current.mutate(newChalet as any);
+      result.current.mutate(newChalet as ChaletInsert);
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -111,7 +112,7 @@ describe("useUpdateChalet", () => {
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: { id: "c-1", name: "Updated" }, error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useUpdateChalet());
 
@@ -134,7 +135,7 @@ describe("useDeleteChalet", () => {
       delete: vi.fn().mockReturnThis(),
       eq: vi.fn().mockResolvedValue({ error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useDeleteChalet());
 
@@ -157,7 +158,7 @@ describe("useToggleChaletActive", () => {
       update: vi.fn().mockReturnThis(),
       eq: vi.fn().mockResolvedValue({ error: null }),
     };
-    mockSupabase.from.mockImplementation(() => chain as any);
+    mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
 
     const { result } = renderHookWithProviders(() => useToggleChaletActive());
 

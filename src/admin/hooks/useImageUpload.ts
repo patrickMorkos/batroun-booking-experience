@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { uploadFile, deleteFile } from "@/lib/storage";
 import { compressImage } from "@/lib/imageCompressor";
 import type { ChaletImageInsert } from "@/types/database";
 
@@ -11,10 +12,7 @@ export function useImageUpload() {
     const fileExt = compressed.name.split(".").pop()?.toLowerCase() || "jpg";
     const fileName = `${chaletId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("chalet-images")
-      .upload(fileName, compressed, { contentType: compressed.type, upsert: false });
-    if (uploadError) throw uploadError;
+    await uploadFile("chalet-images", fileName, compressed, compressed.type);
 
     const { data: urlData } = supabase.storage
       .from("chalet-images")
@@ -50,7 +48,7 @@ export function useImageUpload() {
 
   const deleteMutation = useMutation({
     mutationFn: async ({ imageId, storagePath }: { imageId: string; storagePath: string }) => {
-      await supabase.storage.from("chalet-images").remove([storagePath]);
+      await deleteFile("chalet-images", storagePath);
       const { error } = await supabase.from("chalet_images").delete().eq("id", imageId);
       if (error) throw error;
     },

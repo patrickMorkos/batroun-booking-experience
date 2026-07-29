@@ -43,7 +43,7 @@ export default function ImageUploader({ chaletId, currentImageCount }: ImageUplo
     for (const { file } of previews) {
       try {
         await upload.mutateAsync({ file, chaletId, displayOrder: order++ });
-      } catch (e: any) {
+      } catch (e) {
         toast.error(`Failed to upload ${file.name}: ${e.message}`);
         return;
       }
