@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { uploadFile } from "@/lib/storage";
 import type { Amenity, AmenityInsert, AmenityUpdate } from "@/types/database";
 
 export function useAdminAmenities() {
@@ -64,10 +65,7 @@ export function useUploadAmenityImage() {
       const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const fileName = `amenities/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("site-images")
-        .upload(fileName, file, { contentType: file.type, upsert: false });
-      if (uploadError) throw uploadError;
+      await uploadFile("site-images", fileName, file, file.type);
 
       const { data: urlData } = supabase.storage
         .from("site-images")
