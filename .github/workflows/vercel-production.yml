@@ -64,6 +64,14 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      - name: Debug - inspect pulled env file
+        run: |
+          echo "File listing:"
+          ls -la .vercel/ || echo "NO .vercel DIR"
+          echo "---"
+          echo "Contents of .vercel/.env.production.local:"
+          cat .vercel/.env.production.local || echo "CANNOT READ FILE"
+
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
