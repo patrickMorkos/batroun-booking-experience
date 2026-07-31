@@ -62,6 +62,15 @@ export function useUpdateUser() {
   });
 }
 
+export function useUpdateUserPassword() {
+  return useMutation({
+    mutationFn: async ({ id, password }: { id: string; password: string }) => {
+      const { error } = await supabase.rpc("update_admin_password", { p_id: id, p_password: password });
+      if (error) throw new Error(error.message || "Failed to set password");
+    },
+  });
+}
+
 export function useDeleteUser() {
   const queryClient = useQueryClient();
   return useMutation({

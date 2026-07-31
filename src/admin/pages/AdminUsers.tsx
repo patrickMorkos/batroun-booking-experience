@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { useAdminUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/admin/hooks/useUsers";
+import { useAdminUsers, useCreateUser, useUpdateUser, useUpdateUserPassword, useDeleteUser } from "@/admin/hooks/useUsers";
 import { useAuth } from "@/admin/hooks/useAuth";
 import AdminHeader from "@/admin/components/AdminHeader";
 import UserForm, { type UserFormValues } from "@/admin/components/UserForm";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, KeyRound, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile } from "@/types/database";
 
@@ -17,12 +20,36 @@ export default function AdminUsers() {
   const { data: users, isLoading, isError } = useAdminUsers();
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
+  const updateUserPassword = useUpdateUserPassword();
   const deleteUser = useDeleteUser();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<Profile | undefined>();
+  const [passwordUser, setPasswordUser] = useState<Profile | undefined>();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const isSuperAdmin = currentUser?.role === "super_admin";
+
+  const closePasswordDialog = () => {
+    setPasswordUser(undefined);
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleSetPassword = () => {
+    if (!passwordUser) return;
+    if (newPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (newPassword !== confirmPassword) { toast.error("Passwords don't match"); return; }
+
+    updateUserPassword.mutate(
+      { id: passwordUser.id, password: newPassword },
+      {
+        onSuccess: () => { toast.success(`Password updated for ${passwordUser.first_name}`); closePasswordDialog(); },
+        onError: (e) => toast.error(e.message),
+      }
+    );
+  };
 
   const handleCreate = (data: UserFormValues) => {
     createUser.mutate(
@@ -101,6 +128,9 @@ export default function AdminUsers() {
                             <Button variant="ghost" size="icon" onClick={() => setEditingUser(user)}>
                               <Pencil className="h-4 w-4" />
                             </Button>
+                            <Button variant="ghost" size="icon" onClick={() => setPasswordUser(user)}>
+                              <KeyRound className="h-4 w-4" />
+                            </Button>
                             {user.id !== currentUser?.id && (
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -154,6 +184,30 @@ export default function AdminUsers() {
           isSubmitting={updateUser.isPending}
         />
       )}
+
+      <Dialog open={!!passwordUser} onOpenChange={(v) => !v && closePasswordDialog()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Set Password for {passwordUser?.first_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>New Password</Label>
+              <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            </div>
+            <div>
+              <Label>Confirm Password</Label>
+              <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={closePasswordDialog}>Cancel</Button>
+              <Button onClick={handleSetPassword} disabled={updateUserPassword.isPending}>
+                {updateUserPassword.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : "Set Password"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
