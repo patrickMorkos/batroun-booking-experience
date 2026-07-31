@@ -95,6 +95,10 @@ export default function AdminSiteImages() {
                         <img
                           src={previewUrl}
                           alt={existing?.alt || config.defaultAlt}
+                          width={192}
+                          height={128}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                         {isBusy && (

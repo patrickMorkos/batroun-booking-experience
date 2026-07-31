@@ -85,6 +85,10 @@ export default function Extras() {
                 <img
                   src={selectedExtra.media_urls[0]}
                   alt={selectedExtra.name}
+                  width={720}
+                  height={1280}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full aspect-[9/16] object-cover"
                 />
                 <div className="p-4 text-center">
@@ -100,6 +104,10 @@ export default function Extras() {
                         <img
                           src={url}
                           alt={`${selectedExtra.name} ${i + 1}`}
+                          width={720}
+                          height={1280}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full aspect-[9/16] object-cover"
                         />
                       </CarouselItem>

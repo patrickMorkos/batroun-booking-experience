@@ -242,8 +242,11 @@ export default function ChaletDetail() {
                               <img
                                 src={image.url}
                                 alt={`${chalet.name} fullscreen ${index + 1}`}
-                                className="max-h-screen w-full object-contain"
+                                width={1920}
+                                height={1080}
+                                loading="lazy"
                                 decoding="async"
+                                className="max-h-screen w-full object-contain"
                               />
                             </div>
                           </CarouselItem>

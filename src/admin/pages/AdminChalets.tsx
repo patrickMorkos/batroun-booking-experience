@@ -75,7 +75,15 @@ export default function AdminChalets() {
                       <TableRow key={chalet.id} className={isDeleting ? "opacity-50" : ""}>
                         <TableCell>
                           {primaryImage ? (
-                            <img src={primaryImage.url} alt="" className="h-10 w-10 rounded object-cover" />
+                            <img
+                              src={primaryImage.url}
+                              alt=""
+                              width={40}
+                              height={40}
+                              loading="lazy"
+                              decoding="async"
+                              className="h-10 w-10 rounded object-cover"
+                            />
                           ) : (
                             <div className="h-10 w-10 rounded bg-muted" />
                           )}

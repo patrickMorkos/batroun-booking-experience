@@ -32,7 +32,7 @@ export default function AdminGallery() {
   const reorderMutation = useGalleryMediaReorder();
   const updateTitleMutation = useGalleryMediaUpdateTitle();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<{ name: string; pct: number }[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{ name: string; pct: number; isVideo: boolean }[]>([]);
 
   const handleFiles = (files: FileList) => {
     const valid: File[] = [];
@@ -50,7 +50,7 @@ export default function AdminGallery() {
     }
     if (valid.length === 0) return;
 
-    setUploadProgress(valid.map((f) => ({ name: f.name, pct: 0 })));
+    setUploadProgress(valid.map((f) => ({ name: f.name, pct: 0, isVideo: f.type.startsWith("video/") })));
     let completed = 0;
     let failed = 0;
 
@@ -145,7 +145,12 @@ export default function AdminGallery() {
           {uploadProgress.map((item, i) => (
             <div key={i} className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="truncate max-w-[200px] text-muted-foreground">{item.name}</span>
+                <span className="truncate max-w-[200px] text-muted-foreground">
+                  {item.name}
+                  {item.isVideo && item.pct !== -1 && item.pct < 100 && (
+                    <span className="ml-1 text-muted-foreground/70">(compressing video, may take a minute)</span>
+                  )}
+                </span>
                 <span className="text-xs text-muted-foreground">
                   {item.pct === -1 ? "Failed" : `${item.pct}%`}
                 </span>
@@ -210,9 +215,24 @@ export default function AdminGallery() {
 
                       <div className="w-32 h-20 rounded-lg overflow-hidden border border-border shrink-0 bg-muted">
                         {item.type === "video" ? (
-                          <video src={item.url} className="w-full h-full object-cover" muted />
+                          <video
+                            src={item.url}
+                            width={128}
+                            height={80}
+                            preload="metadata"
+                            className="w-full h-full object-cover"
+                            muted
+                          />
                         ) : (
-                          <img src={item.url} alt={item.title} className="w-full h-full object-cover" />
+                          <img
+                            src={item.url}
+                            alt={item.title}
+                            width={128}
+                            height={80}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover"
+                          />
                         )}
                       </div>
 

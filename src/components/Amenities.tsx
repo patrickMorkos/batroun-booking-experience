@@ -158,6 +158,8 @@ export default function Amenities() {
                             {item.type === "video" ? (
                               <video
                                 src={item.url}
+                                width={1920}
+                                height={1080}
                                 className="max-h-screen w-full object-contain"
                                 muted
                                 controls
@@ -169,8 +171,11 @@ export default function Amenities() {
                               <img
                                 src={item.url}
                                 alt={item.title || "Gallery"}
-                                className="max-h-screen w-full object-contain"
+                                width={1920}
+                                height={1080}
+                                loading="lazy"
                                 decoding="async"
+                                className="max-h-screen w-full object-contain"
                               />
                             )}
                           </div>
@@ -194,6 +199,10 @@ export default function Amenities() {
               <img
                 src={selectedAmenity.image_url}
                 alt={selectedAmenity.name}
+                width={720}
+                height={1280}
+                loading="lazy"
+                decoding="async"
                 className="w-full aspect-[9/16] object-cover"
               />
               <div className="p-4 text-center">

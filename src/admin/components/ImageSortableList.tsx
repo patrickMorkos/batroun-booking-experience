@@ -24,7 +24,15 @@ function SortableImage({ image, onDelete, onSetPrimary, isDeleting, isSettingPri
 
   return (
     <div ref={setNodeRef} style={style} className="group relative aspect-square rounded-lg border border-border/50 overflow-hidden bg-muted">
-      <img src={image.url} alt="" className="h-full w-full object-cover" />
+      <img
+        src={image.url}
+        alt=""
+        width={200}
+        height={200}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
 
       {(isDeleting || isSettingPrimary) && (

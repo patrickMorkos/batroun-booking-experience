@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { uploadFile, deleteFile } from "@/lib/storage";
 import { compressImage } from "@/lib/imageCompressor";
+import { compressVideo } from "@/lib/videoCompressor";
 import type { GalleryMedia } from "@/types/database";
 
 export function useAdminGalleryMedia() {
@@ -26,7 +27,9 @@ export function useGalleryMediaUpload() {
       let processedFile = file;
       const isVideo = file.type.startsWith("video/");
 
-      if (!isVideo) {
+      if (isVideo) {
+        processedFile = await compressVideo(file, onProgress);
+      } else {
         processedFile = await compressImage(file);
       }
 
