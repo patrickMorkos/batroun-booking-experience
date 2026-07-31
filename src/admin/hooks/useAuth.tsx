@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { supabase, ADMIN_TOKEN_KEY } from "@/lib/supabase";
 import type { Profile } from "@/types/database";
 
@@ -11,6 +11,12 @@ interface AuthState {
   user: AuthUser | null;
   profile: Profile | null;
   isLoading: boolean;
+}
+
+interface AuthContextValue extends AuthState {
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  resetPassword: (_email: string) => Promise<never>;
 }
 
 function decodeTokenPayload(token: string): { sub: string; exp: number } | null {
@@ -28,7 +34,9 @@ function isTokenValid(token: string | null): token is string {
   return !!payload?.exp && payload.exp * 1000 > Date.now();
 }
 
-export function useAuth() {
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
     profile: null,
@@ -80,9 +88,19 @@ export function useAuth() {
     setState({ user: null, profile: null, isLoading: false });
   };
 
-  const resetPassword = async (_email: string) => {
+  const resetPassword = async (_email: string): Promise<never> => {
     throw new Error("Self-service password reset isn't available. Please ask another admin to reset it for you.");
   };
 
-  return { ...state, signIn, signOut, resetPassword };
+  return (
+    <AuthContext.Provider value={{ ...state, signIn, signOut, resetPassword }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  return ctx;
 }

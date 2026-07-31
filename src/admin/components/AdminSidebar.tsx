@@ -35,7 +35,11 @@ export default function AdminSidebar() {
 
   const handleSignOut = async () => {
     setLoggingOut(true);
-    await signOut();
+    try {
+      await signOut();
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   const isActive = (path: string) => {

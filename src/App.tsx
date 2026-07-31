@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePageTracking } from "@/hooks/usePageTracking";
+import { AuthProvider } from "@/admin/hooks/useAuth";
 import Index from "./pages/Index";
 import ChaletDetail from "./pages/ChaletDetail";
 import NotFound from "./pages/NotFound";
@@ -87,7 +88,9 @@ const App = () => (
       <Sonner />
       <Analytics />
       <BrowserRouter>
-        <AppShell />
+        <AuthProvider>
+          <AppShell />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

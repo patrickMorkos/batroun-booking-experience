@@ -5,10 +5,10 @@ import { buildProfile } from "@/test/mocks/factories";
 
 // Must import the mock before the hook
 import "@/test/mocks/supabase";
-import { useAuth } from "@/admin/hooks/useAuth";
+import { useAuth, AuthProvider } from "@/admin/hooks/useAuth";
 
 function Wrapper({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <AuthProvider>{children}</AuthProvider>;
 }
 
 function makeToken(sub: string, exp = Math.floor(Date.now() / 1000) + 3600) {
