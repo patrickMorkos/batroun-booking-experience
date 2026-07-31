@@ -134,7 +134,7 @@ export default function AdminAmenities() {
                       <TableCell className="font-medium">{amenity.name}</TableCell>
                       <TableCell className="hidden sm:table-cell">
                         {amenity.image_url ? (
-                          <img src={amenity.image_url} alt={amenity.name} className="h-10 w-14 object-cover rounded" />
+                          <img src={amenity.image_url} alt={amenity.name} width={56} height={40} loading="lazy" decoding="async" className="h-10 w-14 object-cover rounded" />
                         ) : (
                           <span className="text-muted-foreground text-sm">No image</span>
                         )}
@@ -205,7 +205,7 @@ export default function AdminAmenities() {
               />
               {form.image_url ? (
                 <div className="mt-2 relative">
-                  <img src={form.image_url} alt="Preview" className="w-full h-32 object-cover rounded-lg" />
+                  <img src={form.image_url} alt="Preview" width={400} height={128} loading="lazy" decoding="async" className="w-full h-32 object-cover rounded-lg" />
                   <Button
                     type="button"
                     variant="secondary"

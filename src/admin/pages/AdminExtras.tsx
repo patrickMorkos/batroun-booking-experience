@@ -238,7 +238,7 @@ export default function AdminExtras() {
                 <div className="mt-2 space-y-2">
                   {form.media_urls.map((url, i) => (
                     <div key={i} className="relative group">
-                      <img src={url} alt={`Media ${i + 1}`} className="h-20 w-full object-cover rounded-lg" />
+                      <img src={url} alt={`Media ${i + 1}`} width={400} height={80} loading="lazy" decoding="async" className="h-20 w-full object-cover rounded-lg" />
                       <button
                         type="button"
                         onClick={() => removeMedia(i)}

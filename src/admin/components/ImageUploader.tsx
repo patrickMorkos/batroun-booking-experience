@@ -84,7 +84,7 @@ export default function ImageUploader({ chaletId, currentImageCount }: ImageUplo
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {previews.map((preview, i) => (
               <div key={i} className="group relative aspect-square rounded-lg overflow-hidden border border-border/50">
-                <img src={preview.url} alt="" className="h-full w-full object-cover" />
+                <img src={preview.url} alt="" width={200} height={200} decoding="async" className="h-full w-full object-cover" />
                 <button
                   type="button"
                   onClick={() => removePreview(i)}
