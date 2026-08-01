@@ -44,7 +44,7 @@ export default function AdminSiteImages() {
     const existing = getImageForSlot(slot);
     if (!existing) return;
     deleteMutation.mutate(
-      { id: existing.id, storagePath: existing.storage_path },
+      { id: existing.id, storagePath: existing.storage_path, thumbnailStoragePath: existing.thumbnail_storage_path },
       {
         onSuccess: () => toast.success("Reset to default image."),
         onError: (e) => toast.error(e.message),
@@ -82,7 +82,7 @@ export default function AdminSiteImages() {
           : SITE_IMAGE_SLOTS.map((config) => {
               const existing = getImageForSlot(config.slot);
               const isCustom = !!existing;
-              const previewUrl = existing?.url ?? config.fallback;
+              const previewUrl = existing?.thumbnail_url ?? existing?.url ?? config.fallback;
               const isBusy =
                 (uploadMutation.isPending && uploadMutation.variables?.slot === config.slot) ||
                 (deleteMutation.isPending && deleteMutation.variables?.id === existing?.id);

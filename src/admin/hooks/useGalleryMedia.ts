@@ -34,7 +34,8 @@ export function useGalleryMediaUpload() {
       }
 
       const fileExt = processedFile.name.split(".").pop()?.toLowerCase() || "bin";
-      const fileName = `gallery/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+      const baseName = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const fileName = `gallery/${baseName}.${fileExt}`;
       const type = isVideo ? "video" : "image";
 
       await uploadFile("gallery-media", fileName, processedFile, processedFile.type, onProgress);
@@ -42,6 +43,24 @@ export function useGalleryMediaUpload() {
       const { data: urlData } = supabase.storage
         .from("gallery-media")
         .getPublicUrl(fileName);
+
+      let thumbnailUrl: string | null = null;
+      let thumbnailStoragePath: string | null = null;
+
+      if (!isVideo) {
+        const thumbnail = await compressImage(file, 480, 480, 0.75);
+        const thumbnailExt = thumbnail.name.split(".").pop()?.toLowerCase() || "jpg";
+        const thumbnailFileName = `gallery/${baseName}-thumb.${thumbnailExt}`;
+
+        await uploadFile("gallery-media", thumbnailFileName, thumbnail, thumbnail.type);
+
+        const { data: thumbnailUrlData } = supabase.storage
+          .from("gallery-media")
+          .getPublicUrl(thumbnailFileName);
+
+        thumbnailUrl = thumbnailUrlData.publicUrl;
+        thumbnailStoragePath = thumbnailFileName;
+      }
 
       const { data: maxOrder } = await supabase
         .from("gallery_media")
@@ -57,6 +76,8 @@ export function useGalleryMediaUpload() {
         .insert({
           url: urlData.publicUrl,
           storage_path: fileName,
+          thumbnail_url: thumbnailUrl,
+          thumbnail_storage_path: thumbnailStoragePath,
           type,
           title: title ?? "",
           display_order: nextOrder,
@@ -77,8 +98,23 @@ export function useGalleryMediaDelete() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, storagePath }: { id: string; storagePath: string }) => {
+    mutationFn: async ({
+      id,
+      storagePath,
+      thumbnailStoragePath,
+    }: {
+      id: string;
+      storagePath: string;
+      thumbnailStoragePath?: string | null;
+    }) => {
       await deleteFile("gallery-media", storagePath);
+      if (thumbnailStoragePath) {
+        try {
+          await deleteFile("gallery-media", thumbnailStoragePath);
+        } catch {
+          // Non-blocking: thumbnail may already be gone or not yet backfilled.
+        }
+      }
       const { error } = await supabase.from("gallery_media").delete().eq("id", id);
       if (error) throw error;
     },

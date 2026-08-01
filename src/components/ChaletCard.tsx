@@ -15,7 +15,7 @@ export default function ChaletCard({ chalet }: Props) {
       <div className="relative overflow-hidden h-56">
         {primaryImage ? (
           <OptimizedImage
-            src={primaryImage.url}
+            src={primaryImage.thumbnail_url ?? primaryImage.url}
             alt={chalet.name}
             width={800}
             height={600}

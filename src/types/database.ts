@@ -88,6 +88,8 @@ export interface Database {
           chalet_id: string;
           storage_path: string;
           url: string;
+          thumbnail_url: string | null;
+          thumbnail_storage_path: string | null;
           display_order: number;
           is_primary: boolean;
           created_at: string;
@@ -97,6 +99,8 @@ export interface Database {
           chalet_id: string;
           storage_path: string;
           url: string;
+          thumbnail_url?: string | null;
+          thumbnail_storage_path?: string | null;
           display_order?: number;
           is_primary?: boolean;
           created_at?: string;
@@ -105,6 +109,8 @@ export interface Database {
           chalet_id?: string;
           storage_path?: string;
           url?: string;
+          thumbnail_url?: string | null;
+          thumbnail_storage_path?: string | null;
           display_order?: number;
           is_primary?: boolean;
         };
@@ -160,6 +166,8 @@ export interface Database {
           slot: string;
           url: string;
           storage_path: string;
+          thumbnail_url: string | null;
+          thumbnail_storage_path: string | null;
           alt: string;
           updated_at: string;
         };
@@ -168,6 +176,8 @@ export interface Database {
           slot: string;
           url: string;
           storage_path: string;
+          thumbnail_url?: string | null;
+          thumbnail_storage_path?: string | null;
           alt?: string;
           updated_at?: string;
         };
@@ -175,6 +185,8 @@ export interface Database {
           slot?: string;
           url?: string;
           storage_path?: string;
+          thumbnail_url?: string | null;
+          thumbnail_storage_path?: string | null;
           alt?: string;
           updated_at?: string;
         };
@@ -184,6 +196,8 @@ export interface Database {
           id: string;
           url: string;
           storage_path: string;
+          thumbnail_url: string | null;
+          thumbnail_storage_path: string | null;
           type: string;
           title: string;
           display_order: number;
@@ -193,6 +207,8 @@ export interface Database {
           id?: string;
           url: string;
           storage_path: string;
+          thumbnail_url?: string | null;
+          thumbnail_storage_path?: string | null;
           type?: string;
           title?: string;
           display_order?: number;
@@ -201,6 +217,8 @@ export interface Database {
         Update: {
           url?: string;
           storage_path?: string;
+          thumbnail_url?: string | null;
+          thumbnail_storage_path?: string | null;
           type?: string;
           title?: string;
           display_order?: number;

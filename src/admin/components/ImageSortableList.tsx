@@ -25,7 +25,7 @@ function SortableImage({ image, onDelete, onSetPrimary, isDeleting, isSettingPri
   return (
     <div ref={setNodeRef} style={style} className="group relative aspect-square rounded-lg border border-border/50 overflow-hidden bg-muted">
       <img
-        src={image.url}
+        src={image.thumbnail_url ?? image.url}
         alt=""
         width={200}
         height={200}
@@ -121,7 +121,7 @@ export default function ImageSortableList({ images: initialImages }: ImageSortab
 
   const handleDelete = (image: ChaletImage) => {
     deleteImage.mutate(
-      { imageId: image.id, storagePath: image.storage_path },
+      { imageId: image.id, storagePath: image.storage_path, thumbnailStoragePath: image.thumbnail_storage_path },
       {
         onSuccess: () => {
           setImages((prev) => prev.filter((img) => img.id !== image.id));

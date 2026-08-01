@@ -54,6 +54,41 @@ describe("useImageUpload", () => {
       }));
     });
 
+    it("also uploads a thumbnail and includes it in the insert", async () => {
+      vi.mocked(uploadFile).mockResolvedValue(undefined);
+
+      const insertedImage = buildChaletImage({ chalet_id: "chalet-1" });
+      const chain = {
+        insert: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: insertedImage, error: null }),
+      };
+      mockSupabase.from.mockImplementation(() => chain as unknown as ReturnType<typeof mockSupabase.from>);
+
+      const { result } = renderHookWithProviders(() => useImageUpload());
+
+      const file = new File(["test"], "photo.jpg", { type: "image/jpeg" });
+
+      await act(async () => {
+        result.current.upload.mutate({ file, chaletId: "chalet-1", displayOrder: 0 });
+      });
+
+      await waitFor(() => expect(result.current.upload.isSuccess).toBe(true));
+
+      // Full image + thumbnail = 2 uploads, both under the same chalet-images bucket/prefix.
+      expect(uploadFile).toHaveBeenCalledTimes(2);
+      expect(uploadFile).toHaveBeenCalledWith(
+        "chalet-images",
+        expect.stringContaining("-thumb."),
+        expect.anything(),
+        expect.any(String)
+      );
+      expect(chain.insert).toHaveBeenCalledWith(expect.objectContaining({
+        thumbnail_url: expect.stringContaining("-thumb."),
+        thumbnail_storage_path: expect.stringContaining("-thumb."),
+      }));
+    });
+
     it("throws when storage upload fails", async () => {
       vi.mocked(uploadFile).mockRejectedValue(new Error("Upload failed"));
 

@@ -76,7 +76,7 @@ export default function AdminChalets() {
                         <TableCell>
                           {primaryImage ? (
                             <img
-                              src={primaryImage.url}
+                              src={primaryImage.thumbnail_url ?? primaryImage.url}
                               alt=""
                               width={40}
                               height={40}

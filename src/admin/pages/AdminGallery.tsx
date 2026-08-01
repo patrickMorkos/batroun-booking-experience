@@ -90,7 +90,7 @@ export default function AdminGallery() {
 
   const handleDelete = (item: GalleryMedia) => {
     deleteMutation.mutate(
-      { id: item.id, storagePath: item.storage_path },
+      { id: item.id, storagePath: item.storage_path, thumbnailStoragePath: item.thumbnail_storage_path },
       {
         onSuccess: () => toast.success("Media deleted."),
         onError: (e) => toast.error(e.message),
@@ -225,7 +225,7 @@ export default function AdminGallery() {
                           />
                         ) : (
                           <img
-                            src={item.url}
+                            src={item.thumbnail_url ?? item.url}
                             alt={item.title}
                             width={128}
                             height={80}

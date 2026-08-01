@@ -33,7 +33,7 @@ describe("ChaletCard", () => {
     const chalet = buildChaletWithImages({
       name: "Mountain Lodge",
       chalet_images: [
-        { id: "img-1", chalet_id: "c-1", storage_path: "p.jpg", url: "https://example.com/photo.jpg", display_order: 0, is_primary: true, created_at: "" },
+        { id: "img-1", chalet_id: "c-1", storage_path: "p.jpg", url: "https://example.com/photo.jpg", thumbnail_url: null, thumbnail_storage_path: null, display_order: 0, is_primary: true, created_at: "" },
       ],
     });
 
@@ -41,6 +41,54 @@ describe("ChaletCard", () => {
 
     const img = screen.getByRole("img", { name: "Mountain Lodge" });
     expect(img).toHaveAttribute("src", "https://example.com/photo.jpg");
+  });
+
+  it("prefers thumbnail_url over full url when present", () => {
+    const chalet = buildChaletWithImages({
+      name: "Lakeside Cabin",
+      chalet_images: [
+        {
+          id: "img-1",
+          chalet_id: "c-1",
+          storage_path: "p.jpg",
+          url: "https://example.com/full.jpg",
+          thumbnail_url: "https://example.com/thumb.jpg",
+          thumbnail_storage_path: "p-thumb.jpg",
+          display_order: 0,
+          is_primary: true,
+          created_at: "",
+        },
+      ],
+    });
+
+    renderWithProviders(<ChaletCard chalet={chalet} />);
+
+    const img = screen.getByRole("img", { name: "Lakeside Cabin" });
+    expect(img).toHaveAttribute("src", "https://example.com/thumb.jpg");
+  });
+
+  it("falls back to full url when thumbnail_url is null", () => {
+    const chalet = buildChaletWithImages({
+      name: "Riverside Retreat",
+      chalet_images: [
+        {
+          id: "img-1",
+          chalet_id: "c-1",
+          storage_path: "p.jpg",
+          url: "https://example.com/full.jpg",
+          thumbnail_url: null,
+          thumbnail_storage_path: null,
+          display_order: 0,
+          is_primary: true,
+          created_at: "",
+        },
+      ],
+    });
+
+    renderWithProviders(<ChaletCard chalet={chalet} />);
+
+    const img = screen.getByRole("img", { name: "Riverside Retreat" });
+    expect(img).toHaveAttribute("src", "https://example.com/full.jpg");
   });
 
   it("shows 'No image' when no images exist", () => {

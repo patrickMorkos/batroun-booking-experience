@@ -34,6 +34,8 @@ export function buildChaletImage(overrides: Partial<ChaletImage> = {}): ChaletIm
     chalet_id: "chalet-1",
     storage_path: `chalet-1/${id}.jpg`,
     url: `https://test.supabase.co/storage/v1/object/public/chalet-images/chalet-1/${id}.jpg`,
+    thumbnail_url: null,
+    thumbnail_storage_path: null,
     display_order: 0,
     is_primary: true,
     created_at: "2024-01-01T00:00:00Z",
