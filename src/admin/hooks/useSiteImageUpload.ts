@@ -26,11 +26,12 @@ export function useSiteImageUpload() {
         .eq("slot", slot)
         .maybeSingle();
 
-      const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const compressed = await compressImage(file);
+      const fileExt = compressed.name.split(".").pop()?.toLowerCase() || "jpg";
       const baseName = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const fileName = `${slot}/${baseName}.${fileExt}`;
 
-      await uploadFile("site-images", fileName, file, file.type);
+      await uploadFile("site-images", fileName, compressed, compressed.type);
 
       const { data: urlData } = supabase.storage
         .from("site-images")
